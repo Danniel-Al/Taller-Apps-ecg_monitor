@@ -1,7 +1,8 @@
 // lib/utils/constants.dart
-// Opciones para los selectores demográficos
+// OPCIONES PARA LOS SELECTORES DEMOGRÁFICOS
+// Con descripciones amigables para el usuario
 
-// Rangos de edad (índice -> texto visible)
+// Rangos de edad
 const List<String> ageRanges = [
   '18-30 años',
   '31-45 años',
@@ -10,14 +11,14 @@ const List<String> ageRanges = [
   '>75 años',
 ];
 
-// Género (índice -> texto visible)
+// Género
 const List<String> genders = [
   'Femenino',
   'Masculino',
   'Prefiero no decirlo',
 ];
 
-// Antecedentes cardíacos (índice -> texto visible)
+// Antecedentes cardíacos
 const List<String> conditionsList = [
   'Ninguno',
   'Hipertensión arterial',
@@ -27,20 +28,21 @@ const List<String> conditionsList = [
   'Cardiopatía congénita',
 ];
 
-// Síntomas actuales (índice -> texto visible)
+// Síntomas actuales
 const List<String> symptomsList = [
   'Ningún síntoma',
-  'Palpitaciones',
+  'Palpitaciones (latidos irregulares o fuertes)',
   'Dolor en el pecho',
-  'Mareos / desmayos',
+  'Mareos o desmayos',
   'Falta de aire',
 ];
 
-// Medicamentos (índice -> texto visible)
+// Medicamentos con descripciones claras (sin tecnicismos confusos)
 const List<String> medicationsList = [
   'Ninguno',
-  'Betabloqueadores',
-  'Antidepresivos / antipsicóticos',
-  'Antiarrítmicos',
-  'Diuréticos',
+  '💊 Betabloqueadores (para presión o ritmo cardíaco)',
+  '🧠 Antidepresivos / ansiolíticos (para depresión o ansiedad)',
+  '⚡ Antiarrítmicos (para problemas del ritmo cardíaco)',
+  '💧 Diuréticos (pastillas para eliminar líquidos)',
 ];
+

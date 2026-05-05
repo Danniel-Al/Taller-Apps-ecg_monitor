@@ -1,19 +1,15 @@
 // lib/models/user_data.dart
-// Modelo de datos demográficos del usuario
+// MODELO DE DATOS DEMOGRÁFICOS DEL USUARIO
 
 class UserData {
-  // Datos básicos
   String username;
-  bool hasCompletedDemographics;  // ¿Ya llenó los datos?
-
-  // Datos demográficos
+  bool hasCompletedDemographics;
   int ageRange;      // 0: 18-30, 1: 31-45, 2: 46-60, 3: 61-75, 4: >75
   int gender;        // 0: Femenino, 1: Masculino, 2: Prefiero no decirlo
   int conditions;    // 0: Ninguno, 1: Hipertensión, 2: Insuficiencia cardíaca, etc.
   int symptoms;      // 0: Ninguno, 1: Palpitaciones, 2: Dolor pecho, etc.
   int medications;   // 0: Ninguno, 1: Betabloqueadores, 2: Antidepresivos, etc.
 
-  // Constructor
   UserData({
     required this.username,
     this.hasCompletedDemographics = false,
@@ -24,7 +20,6 @@ class UserData {
     this.medications = 0,
   });
 
-  // Convertir a mapa (para guardar en SharedPreferences después)
   Map<String, dynamic> toMap() {
     return {
       'username': username,
@@ -37,7 +32,6 @@ class UserData {
     };
   }
 
-  // Crear desde mapa (para cargar desde SharedPreferences después)
   factory UserData.fromMap(Map<String, dynamic> map) {
     return UserData(
       username: map['username'],
