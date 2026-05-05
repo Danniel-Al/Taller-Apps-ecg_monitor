@@ -1,12 +1,11 @@
 // lib/screens/login_screen.dart
 // PANTALLA DE INICIO DE SESIÓN
-// Permite al usuario autenticarse para entrar a la aplicación
 
 import 'package:flutter/material.dart';
-import 'register_screen.dart';  // Importa la pantalla de registro para navegar
+import 'register_screen.dart';
+import 'demographic_screen.dart';
 
 class LoginScreen extends StatefulWidget {
-  // StatefulWidget = widget que PUEDE cambiar su estado (ej: mostrar errores)
   const LoginScreen({super.key});
 
   @override
@@ -14,34 +13,36 @@ class LoginScreen extends StatefulWidget {
 }
 
 class _LoginScreenState extends State<LoginScreen> {
-  // Controladores: permiten leer el texto que el usuario escribe en los campos
   final TextEditingController _usernameController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
 
-  // Función que se ejecuta al presionar el botón "Iniciar sesión"
   void _handleLogin() {
-    // trim() elimina espacios en blanco al inicio y final
     final username = _usernameController.text.trim();
     final password = _passwordController.text;
 
-    // Validación básica: ambos campos deben tener contenido
     if (username.isEmpty || password.isEmpty) {
       _showError('Por favor ingresa usuario y contraseña');
     } else {
-      // Por ahora solo muestra un mensaje de bienvenida
-      // En el futuro: validará contra usuarios registrados y navegará a Home
       _showSuccess('Bienvenido $username');
+      Future.delayed(const Duration(seconds: 1), () {
+        if (mounted) {
+          Navigator.pushReplacement(
+            context,
+            MaterialPageRoute(
+              builder: (_) => DemographicScreen(username: username),
+            ),
+          );
+        }
+      });
     }
   }
 
-  // Muestra un mensaje de error (fondo rojo)
   void _showError(String message) {
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(content: Text(message), backgroundColor: Colors.red),
     );
   }
 
-  // Muestra un mensaje de éxito (fondo verde)
   void _showSuccess(String message) {
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(content: Text(message), backgroundColor: Colors.green),
@@ -50,70 +51,87 @@ class _LoginScreenState extends State<LoginScreen> {
 
   @override
   Widget build(BuildContext context) {
-    // Scaffold = estructura básica de una pantalla (barra superior, cuerpo, etc.)
     return Scaffold(
+      backgroundColor: Colors.white,
       body: Padding(
-        // Padding = margen interior de 24 píxeles en todos los lados
         padding: const EdgeInsets.all(24.0),
         child: Column(
-          // Column = organiza los widgets en vertical (uno debajo del otro)
-          mainAxisAlignment: MainAxisAlignment.center,  // Centra verticalmente
+          mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            // ========== ICONO PRINCIPAL ==========
-            const Icon(Icons.favorite, size: 80, color: Colors.red),
-            const SizedBox(height: 20),  // Espacio vertical
-
-            // ========== TÍTULO ==========
+            // Icono principal
+            Container(
+              padding: const EdgeInsets.all(20),
+              decoration: BoxDecoration(
+                color: Colors.red.shade50,
+                shape: BoxShape.circle,
+              ),
+              child: const Icon(Icons.favorite, size: 60, color: Colors.red),
+            ),
+            const SizedBox(height: 20),
             const Text(
               'Monitor ECG',
-              style: TextStyle(fontSize: 28, fontWeight: FontWeight.bold),
+              style: TextStyle(fontSize: 28, fontWeight: FontWeight.bold, color: Colors.red),
             ),
             const SizedBox(height: 40),
-
-            // ========== CAMPO: USUARIO ==========
+            // Campo usuario
             TextField(
-              controller: _usernameController,  // Conecta con el controlador
-              decoration: const InputDecoration(
-                labelText: 'Nombre de usuario',  // Etiqueta flotante
-                border: OutlineInputBorder(),    // Borde redondeado
-                prefixIcon: Icon(Icons.person),  // Ícono a la izquierda
+              controller: _usernameController,
+              decoration: InputDecoration(
+                labelText: 'Nombre de usuario',
+                border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
+                prefixIcon: const Icon(Icons.person),
+                filled: true,
+                fillColor: Colors.grey.shade50,
               ),
             ),
             const SizedBox(height: 16),
-
-            // ========== CAMPO: CONTRASEÑA ==========
+            // Campo contraseña
             TextField(
               controller: _passwordController,
-              obscureText: true,  // Oculta el texto (muestra puntos ●●●)
-              decoration: const InputDecoration(
+              obscureText: true,
+              decoration: InputDecoration(
                 labelText: 'Contraseña',
-                border: OutlineInputBorder(),
-                prefixIcon: Icon(Icons.lock),
+                border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
+                prefixIcon: const Icon(Icons.lock),
+                filled: true,
+                fillColor: Colors.grey.shade50,
               ),
             ),
             const SizedBox(height: 24),
-
-            // ========== BOTÓN: INICIAR SESIÓN ==========
-            ElevatedButton(
-              onPressed: _handleLogin,  // Función al hacer clic
-              style: ElevatedButton.styleFrom(
-                minimumSize: const Size(double.infinity, 50),  // Ancho completo, alto 50
-                backgroundColor: Colors.red,  // Fondo rojo
+            // Botón iniciar sesión
+            SizedBox(
+              width: double.infinity,
+              child: ElevatedButton(
+                onPressed: _handleLogin,
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: Colors.white,
+                  foregroundColor: Colors.red,
+                  padding: const EdgeInsets.symmetric(vertical: 14),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(30),
+                    side: BorderSide(color: Colors.red.shade300, width: 1.5),
+                  ),
+                  elevation: 2,
+                ),
+                child: const Text(
+                  'Iniciar sesión',
+                  style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                ),
               ),
-              child: const Text('Iniciar sesión', style: TextStyle(fontSize: 16)),
             ),
             const SizedBox(height: 16),
-
-            // ========== BOTÓN: IR A REGISTRO ==========
+            // Botón ir a registro
             TextButton(
               onPressed: () {
-                // Navega a la pantalla de registro
                 Navigator.push(
                   context,
                   MaterialPageRoute(builder: (_) => const RegisterScreen()),
                 );
               },
-              child: const Text('¿No tienes cuenta? Regístrate'),
+              child: Text(
+                '¿No tienes cuenta? Regístrate',
+                style: TextStyle(color: Colors.red.shade700),
+              ),
             ),
           ],
         ),

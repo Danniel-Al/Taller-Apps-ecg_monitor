@@ -1,6 +1,5 @@
 // lib/screens/register_screen.dart
 // PANTALLA DE REGISTRO DE NUEVOS USUARIOS
-// Permite crear una nueva cuenta con validaciones
 
 import 'package:flutter/material.dart';
 
@@ -12,45 +11,37 @@ class RegisterScreen extends StatefulWidget {
 }
 
 class _RegisterScreenState extends State<RegisterScreen> {
-  // Controladores para cada campo de texto
   final TextEditingController _usernameController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
   final TextEditingController _confirmController = TextEditingController();
 
-  // Función que se ejecuta al presionar "Registrarse"
   void _handleRegister() {
     final username = _usernameController.text.trim();
     final password = _passwordController.text;
     final confirm = _confirmController.text;
 
-    // ========== VALIDACIONES ==========
     if (username.isEmpty) {
       _showError('Ingresa un nombre de usuario');
     } else if (password.isEmpty) {
       _showError('Ingresa una contraseña');
     } else if (password != confirm) {
-      _showError('Las contraseñas no coinciden');  // Validación más importante
+      _showError('Las contraseñas no coinciden');
     } else if (password.length < 4) {
       _showError('La contraseña debe tener al menos 4 caracteres');
     } else {
-      // TODO: Aquí se guardará el usuario (SharedPreferences o base de datos)
       _showSuccess('Registro exitoso. Ahora inicia sesión.');
-      
-      // Regresa automáticamente a la pantalla de login después de 2 segundos
       Future.delayed(const Duration(seconds: 2), () {
-        Navigator.pop(context);  // Cierra la pantalla actual (vuelve al login)
+        Navigator.pop(context);
       });
     }
   }
 
-  // Muestra error en rojo
   void _showError(String message) {
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(content: Text(message), backgroundColor: Colors.red),
     );
   }
 
-  // Muestra éxito en verde
   void _showSuccess(String message) {
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(content: Text(message), backgroundColor: Colors.green),
@@ -60,12 +51,14 @@ class _RegisterScreenState extends State<RegisterScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      // AppBar = barra superior con título y flecha de retroceso
+      backgroundColor: Colors.white,
       appBar: AppBar(
-        title: const Text('Registro'),
+        title: const Text('Registro', style: TextStyle(color: Colors.white)),
+        backgroundColor: Colors.red,
+        elevation: 0,
         leading: IconButton(
-          icon: const Icon(Icons.arrow_back),
-          onPressed: () => Navigator.pop(context),  // Flecha para volver manualmente
+          icon: const Icon(Icons.arrow_back, color: Colors.white),
+          onPressed: () => Navigator.pop(context),
         ),
       ),
       body: Padding(
@@ -73,60 +66,78 @@ class _RegisterScreenState extends State<RegisterScreen> {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            // ========== ICONO DE PERSONA ==========
-            const Icon(Icons.person_add, size: 60, color: Colors.red),
+            Container(
+              padding: const EdgeInsets.all(16),
+              decoration: BoxDecoration(
+                color: Colors.red.shade50,
+                shape: BoxShape.circle,
+              ),
+              child: const Icon(Icons.person_add, size: 50, color: Colors.red),
+            ),
             const SizedBox(height: 20),
-
-            // ========== TÍTULO ==========
             const Text(
               'Crea tu cuenta',
-              style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+              style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold, color: Colors.red),
             ),
             const SizedBox(height: 40),
-
-            // ========== CAMPO: USUARIO ==========
+            // Campo usuario
             TextField(
               controller: _usernameController,
-              decoration: const InputDecoration(
+              decoration: InputDecoration(
                 labelText: 'Nombre de usuario',
-                border: OutlineInputBorder(),
-                prefixIcon: Icon(Icons.person),
+                border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
+                prefixIcon: const Icon(Icons.person),
+                filled: true,
+                fillColor: Colors.grey.shade50,
               ),
             ),
             const SizedBox(height: 16),
-
-            // ========== CAMPO: CONTRASEÑA ==========
+            // Campo contraseña
             TextField(
               controller: _passwordController,
-              obscureText: true,  // Oculta con puntos
-              decoration: const InputDecoration(
+              obscureText: true,
+              decoration: InputDecoration(
                 labelText: 'Contraseña',
-                border: OutlineInputBorder(),
-                prefixIcon: Icon(Icons.lock),
+                border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
+                prefixIcon: const Icon(Icons.lock),
+                filled: true,
+                fillColor: Colors.grey.shade50,
               ),
             ),
             const SizedBox(height: 16),
-
-            // ========== CAMPO: CONFIRMAR CONTRASEÑA ==========
+            // Campo confirmar contraseña
             TextField(
               controller: _confirmController,
               obscureText: true,
-              decoration: const InputDecoration(
+              decoration: InputDecoration(
                 labelText: 'Confirmar contraseña',
-                border: OutlineInputBorder(),
-                prefixIcon: Icon(Icons.lock_outline),
+                border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
+                prefixIcon: const Icon(Icons.lock_outline),
+                filled: true,
+                fillColor: Colors.grey.shade50,
               ),
             ),
             const SizedBox(height: 24),
-
-            // ========== BOTÓN: REGISTRARSE ==========
-            ElevatedButton(
-              onPressed: _handleRegister,
-              style: ElevatedButton.styleFrom(
-                minimumSize: const Size(double.infinity, 50),
-                backgroundColor: Colors.red,
+            // Botón registrarse
+            SizedBox(
+              width: double.infinity,
+              child: ElevatedButton(
+                onPressed: _handleRegister,
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: Colors.white,
+                  foregroundColor: Colors.red,
+                  padding: const EdgeInsets.symmetric(vertical: 14),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(30),
+                    side: BorderSide(color: Colors.red.shade300, width: 1.5),
+                  ),
+                  elevation: 2,
+                ),
+                child: const Text(
+                  'Registrarse',
+                  style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                ),
               ),
-              child: const Text('Registrarse', style: TextStyle(fontSize: 16)),
             ),
           ],
         ),
@@ -134,4 +145,3 @@ class _RegisterScreenState extends State<RegisterScreen> {
     );
   }
 }
-

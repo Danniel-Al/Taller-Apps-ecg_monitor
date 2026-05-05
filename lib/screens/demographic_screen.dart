@@ -1,5 +1,6 @@
 // lib/screens/demographic_screen.dart
-// Pantalla de recolección de datos demográficos (solo primera vez)
+// PANTALLA DE DATOS DEMOGRÁFICOS (SOLO PRIMERA VEZ)
+// Diseño mejorado con tarjetas, iconos y botón blanco
 
 import 'package:flutter/material.dart';
 import '../utils/constants.dart';
@@ -7,7 +8,7 @@ import '../models/user_data.dart';
 import 'home_screen.dart';
 
 class DemographicScreen extends StatefulWidget {
-  final String username;  // Recibe el nombre del usuario que inició sesión
+  final String username;
 
   const DemographicScreen({super.key, required this.username});
 
@@ -16,23 +17,16 @@ class DemographicScreen extends StatefulWidget {
 }
 
 class _DemographicScreenState extends State<DemographicScreen> {
-  // Valores seleccionados por el usuario (índices)
   int _selectedAgeRange = 0;
   int _selectedGender = 0;
   int _selectedConditions = 0;
   int _selectedSymptoms = 0;
   int _selectedMedications = 0;
-
-  // Controlador para el indicador de carga
   bool _isLoading = false;
 
-  // Guardar datos y continuar a Home
   void _saveAndContinue() async {
-    setState(() {
-      _isLoading = true;
-    });
+    setState(() => _isLoading = true);
 
-    // Crear objeto con los datos del usuario
     final userData = UserData(
       username: widget.username,
       hasCompletedDemographics: true,
@@ -43,17 +37,10 @@ class _DemographicScreenState extends State<DemographicScreen> {
       medications: _selectedMedications,
     );
 
-    // TODO: Guardar en SharedPreferences (próximo paso)
-    // Por ahora solo simulamos un pequeño retraso
-
     await Future.delayed(const Duration(milliseconds: 500));
 
     if (mounted) {
-      setState(() {
-        _isLoading = false;
-      });
-
-      // Navegar a la pantalla principal
+      setState(() => _isLoading = false);
       Navigator.pushReplacement(
         context,
         MaterialPageRoute(builder: (_) => const HomeScreen()),
@@ -61,173 +48,193 @@ class _DemographicScreenState extends State<DemographicScreen> {
     }
   }
 
+  Widget _buildSelector({
+    required String label,
+    required String icon,
+    required int value,
+    required List<String> items,
+    required Function(int) onChanged,
+  }) {
+    return Card(
+      elevation: 2,
+      margin: const EdgeInsets.only(bottom: 16),
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+      child: Padding(
+        padding: const EdgeInsets.all(16),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Row(
+              children: [
+                Text(icon, style: const TextStyle(fontSize: 22)),
+                const SizedBox(width: 12),
+                Text(
+                  label,
+                  style: const TextStyle(
+                    fontSize: 16,
+                    fontWeight: FontWeight.w600,
+                    color: Colors.red,
+                  ),
+                ),
+              ],
+            ),
+            const SizedBox(height: 12),
+            DropdownButtonFormField<int>(
+              value: value,
+              decoration: InputDecoration(
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(12),
+                ),
+                contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 12),
+                filled: true,
+                fillColor: Colors.grey.shade50,
+              ),
+              items: items.asMap().entries.map((entry) {
+                return DropdownMenuItem<int>(
+                  value: entry.key,
+                  child: Text(
+                    entry.value,
+                    style: const TextStyle(fontSize: 14),
+                  ),
+                );
+              }).toList(),
+              onChanged: (val) => onChanged(val!),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: Colors.white,
       appBar: AppBar(
-        title: const Text('Datos personales'),
-        automaticallyImplyLeading: false,  // Sin flecha de retroceso
+        title: const Text(
+          'Datos personales',
+          style: TextStyle(color: Colors.white),
+        ),
         backgroundColor: Colors.red,
+        elevation: 0,
+        centerTitle: true,
+        automaticallyImplyLeading: false,
+        flexibleSpace: Container(
+          decoration: const BoxDecoration(
+            gradient: LinearGradient(
+              colors: [Colors.red, Color(0xFFE53935)],
+              begin: Alignment.topLeft,
+              end: Alignment.bottomRight,
+            ),
+          ),
+        ),
       ),
       body: _isLoading
           ? const Center(child: CircularProgressIndicator())
-          : SingleChildScrollView(  // Permite scroll si el contenido es largo
-              padding: const EdgeInsets.all(24.0),
+          : SingleChildScrollView(
+              padding: const EdgeInsets.all(20),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  // Mensaje de bienvenida
-                  Text(
-                    'Hola ${widget.username}',
-                    style: const TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+                  // Mensaje de bienvenida personalizado
+                  Container(
+                    padding: const EdgeInsets.all(20),
+                    decoration: BoxDecoration(
+                      gradient: LinearGradient(
+                        colors: [Colors.red.shade50, Colors.red.shade100],
+                        begin: Alignment.topLeft,
+                        end: Alignment.bottomRight,
+                      ),
+                      borderRadius: BorderRadius.circular(20),
+                    ),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          '¡Hola ${widget.username}! 👋',
+                          style: const TextStyle(
+                            fontSize: 22,
+                            fontWeight: FontWeight.bold,
+                            color: Color(0xFFC62828),
+                          ),
+                        ),
+                        const SizedBox(height: 8),
+                        const Text(
+                          'Para ofrecerte recomendaciones personalizadas y un seguimiento más preciso, necesitamos conocer algunos datos sobre ti.',
+                          style: TextStyle(fontSize: 14, color: Colors.black87),
+                        ),
+                      ],
+                    ),
                   ),
-                  const SizedBox(height: 8),
-                  const Text(
-                    'Para ofrecerte recomendaciones personalizadas, necesitamos algunos datos:',
-                    style: TextStyle(fontSize: 16),
-                  ),
-                  const SizedBox(height: 32),
+                  const SizedBox(height: 24),
 
-                  // ========== SELECTOR: EDAD ==========
-                  const Text('Edad:', style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
-                  const SizedBox(height: 8),
-                  DropdownButtonFormField<int>(
+                  _buildSelector(
+                    label: 'Edad',
+                    icon: '🎂',
                     value: _selectedAgeRange,
-                    decoration: const InputDecoration(
-                      border: OutlineInputBorder(),
-                      contentPadding: EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-                    ),
-                    items: ageRanges.asMap().entries.map((entry) {
-                      final index = entry.key;
-                      final label = entry.value;
-                      return DropdownMenuItem<int>(
-                        value: index,
-                        child: Text(label),
-                      );
-                    }).toList(),
-                    onChanged: (value) {
-                      setState(() {
-                        _selectedAgeRange = value!;
-                      });
-                    },
+                    items: ageRanges,
+                    onChanged: (val) => setState(() => _selectedAgeRange = val),
                   ),
-                  const SizedBox(height: 20),
 
-                  // ========== SELECTOR: SEXO ==========
-                  const Text('Sexo:', style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
-                  const SizedBox(height: 8),
-                  DropdownButtonFormField<int>(
+                  _buildSelector(
+                    label: 'Sexo',
+                    icon: '👤',
                     value: _selectedGender,
-                    decoration: const InputDecoration(
-                      border: OutlineInputBorder(),
-                      contentPadding: EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-                    ),
-                    items: genders.asMap().entries.map((entry) {
-                      final index = entry.key;
-                      final label = entry.value;
-                      return DropdownMenuItem<int>(
-                        value: index,
-                        child: Text(label),
-                      );
-                    }).toList(),
-                    onChanged: (value) {
-                      setState(() {
-                        _selectedGender = value!;
-                      });
-                    },
+                    items: genders,
+                    onChanged: (val) => setState(() => _selectedGender = val),
                   ),
-                  const SizedBox(height: 20),
 
-                  // ========== SELECTOR: ANTECEDENTES ==========
-                  const Text('Antecedentes cardíacos:', style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
-                  const SizedBox(height: 8),
-                  DropdownButtonFormField<int>(
+                  _buildSelector(
+                    label: 'Antecedentes cardíacos',
+                    icon: '❤️',
                     value: _selectedConditions,
-                    decoration: const InputDecoration(
-                      border: OutlineInputBorder(),
-                      contentPadding: EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-                    ),
-                    items: conditionsList.asMap().entries.map((entry) {
-                      final index = entry.key;
-                      final label = entry.value;
-                      return DropdownMenuItem<int>(
-                        value: index,
-                        child: Text(label),
-                      );
-                    }).toList(),
-                    onChanged: (value) {
-                      setState(() {
-                        _selectedConditions = value!;
-                      });
-                    },
+                    items: conditionsList,
+                    onChanged: (val) => setState(() => _selectedConditions = val),
                   ),
-                  const SizedBox(height: 20),
 
-                  // ========== SELECTOR: SÍNTOMAS ==========
-                  const Text('Síntomas actuales:', style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
-                  const SizedBox(height: 8),
-                  DropdownButtonFormField<int>(
+                  _buildSelector(
+                    label: 'Síntomas actuales',
+                    icon: '🤒',
                     value: _selectedSymptoms,
-                    decoration: const InputDecoration(
-                      border: OutlineInputBorder(),
-                      contentPadding: EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-                    ),
-                    items: symptomsList.asMap().entries.map((entry) {
-                      final index = entry.key;
-                      final label = entry.value;
-                      return DropdownMenuItem<int>(
-                        value: index,
-                        child: Text(label),
-                      );
-                    }).toList(),
-                    onChanged: (value) {
-                      setState(() {
-                        _selectedSymptoms = value!;
-                      });
-                    },
+                    items: symptomsList,
+                    onChanged: (val) => setState(() => _selectedSymptoms = val),
                   ),
-                  const SizedBox(height: 20),
 
-                  // ========== SELECTOR: MEDICAMENTOS ==========
-                  const Text('Medicamentos:', style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
-                  const SizedBox(height: 8),
-                  DropdownButtonFormField<int>(
+                  _buildSelector(
+                    label: 'Medicamentos',
+                    icon: '💊',
                     value: _selectedMedications,
-                    decoration: const InputDecoration(
-                      border: OutlineInputBorder(),
-                      contentPadding: EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-                    ),
-                    items: medicationsList.asMap().entries.map((entry) {
-                      final index = entry.key;
-                      final label = entry.value;
-                      return DropdownMenuItem<int>(
-                        value: index,
-                        child: Text(label),
-                      );
-                    }).toList(),
-                    onChanged: (value) {
-                      setState(() {
-                        _selectedMedications = value!;
-                      });
-                    },
+                    items: medicationsList,
+                    onChanged: (val) => setState(() => _selectedMedications = val),
                   ),
-                  const SizedBox(height: 32),
 
-                  // ========== BOTÓN CONTINUAR ==========
+                  const SizedBox(height: 24),
+
                   SizedBox(
                     width: double.infinity,
                     child: ElevatedButton(
                       onPressed: _saveAndContinue,
                       style: ElevatedButton.styleFrom(
+                        backgroundColor: Colors.white,
+                        foregroundColor: Colors.red,
                         padding: const EdgeInsets.symmetric(vertical: 14),
-                        backgroundColor: Colors.red,
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(30),
+                          side: BorderSide(color: Colors.red.shade300, width: 1.5),
+                        ),
+                        elevation: 2,
                       ),
                       child: const Text(
                         'Continuar',
-                        style: TextStyle(fontSize: 18),
+                        style: TextStyle(
+                          fontSize: 18,
+                          fontWeight: FontWeight.bold,
+                        ),
                       ),
                     ),
                   ),
+
+                  const SizedBox(height: 20),
                 ],
               ),
             ),
