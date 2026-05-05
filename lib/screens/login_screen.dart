@@ -1,9 +1,12 @@
 // lib/screens/login_screen.dart
-// Pantalla de inicio de sesión
+// PANTALLA DE INICIO DE SESIÓN
+// Permite al usuario autenticarse para entrar a la aplicación
 
 import 'package:flutter/material.dart';
+import 'register_screen.dart';  // Importa la pantalla de registro para navegar
 
 class LoginScreen extends StatefulWidget {
+  // StatefulWidget = widget que PUEDE cambiar su estado (ej: mostrar errores)
   const LoginScreen({super.key});
 
   @override
@@ -11,32 +14,34 @@ class LoginScreen extends StatefulWidget {
 }
 
 class _LoginScreenState extends State<LoginScreen> {
-  // Controladores para leer el texto de los campos
+  // Controladores: permiten leer el texto que el usuario escribe en los campos
   final TextEditingController _usernameController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
 
   // Función que se ejecuta al presionar el botón "Iniciar sesión"
   void _handleLogin() {
-    final username = _usernameController.text.trim();  // Elimina espacios al inicio/final
+    // trim() elimina espacios en blanco al inicio y final
+    final username = _usernameController.text.trim();
     final password = _passwordController.text;
 
-    // Validación: ambos campos deben tener contenido
+    // Validación básica: ambos campos deben tener contenido
     if (username.isEmpty || password.isEmpty) {
       _showError('Por favor ingresa usuario y contraseña');
     } else {
+      // Por ahora solo muestra un mensaje de bienvenida
+      // En el futuro: validará contra usuarios registrados y navegará a Home
       _showSuccess('Bienvenido $username');
-      // TODO: En el futuro, aquí se navegará a la pantalla principal
     }
   }
 
-  // Muestra un mensaje de error en rojo
+  // Muestra un mensaje de error (fondo rojo)
   void _showError(String message) {
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(content: Text(message), backgroundColor: Colors.red),
     );
   }
 
-  // Muestra un mensaje de éxito en verde
+  // Muestra un mensaje de éxito (fondo verde)
   void _showSuccess(String message) {
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(content: Text(message), backgroundColor: Colors.green),
@@ -45,35 +50,41 @@ class _LoginScreenState extends State<LoginScreen> {
 
   @override
   Widget build(BuildContext context) {
+    // Scaffold = estructura básica de una pantalla (barra superior, cuerpo, etc.)
     return Scaffold(
       body: Padding(
-        padding: const EdgeInsets.all(24.0),  // Margen interior de 24 pixeles
+        // Padding = margen interior de 24 píxeles en todos los lados
+        padding: const EdgeInsets.all(24.0),
         child: Column(
+          // Column = organiza los widgets en vertical (uno debajo del otro)
           mainAxisAlignment: MainAxisAlignment.center,  // Centra verticalmente
           children: [
-            // Icono de corazón rojo
+            // ========== ICONO PRINCIPAL ==========
             const Icon(Icons.favorite, size: 80, color: Colors.red),
-            const SizedBox(height: 20),
+            const SizedBox(height: 20),  // Espacio vertical
 
-            // Título de la app
-            const Text('Monitor ECG', style: TextStyle(fontSize: 28, fontWeight: FontWeight.bold)),
+            // ========== TÍTULO ==========
+            const Text(
+              'Monitor ECG',
+              style: TextStyle(fontSize: 28, fontWeight: FontWeight.bold),
+            ),
             const SizedBox(height: 40),
 
-            // Campo de texto: Usuario
+            // ========== CAMPO: USUARIO ==========
             TextField(
-              controller: _usernameController,
+              controller: _usernameController,  // Conecta con el controlador
               decoration: const InputDecoration(
-                labelText: 'Nombre de usuario',
-                border: OutlineInputBorder(),
-                prefixIcon: Icon(Icons.person),
+                labelText: 'Nombre de usuario',  // Etiqueta flotante
+                border: OutlineInputBorder(),    // Borde redondeado
+                prefixIcon: Icon(Icons.person),  // Ícono a la izquierda
               ),
             ),
             const SizedBox(height: 16),
 
-            // Campo de texto: Contraseña (oculta el texto)
+            // ========== CAMPO: CONTRASEÑA ==========
             TextField(
               controller: _passwordController,
-              obscureText: true,  // Los caracteres se ven como puntos
+              obscureText: true,  // Oculta el texto (muestra puntos ●●●)
               decoration: const InputDecoration(
                 labelText: 'Contraseña',
                 border: OutlineInputBorder(),
@@ -82,21 +93,25 @@ class _LoginScreenState extends State<LoginScreen> {
             ),
             const SizedBox(height: 24),
 
-            // Botón de inicio de sesión
+            // ========== BOTÓN: INICIAR SESIÓN ==========
             ElevatedButton(
-              onPressed: _handleLogin,
+              onPressed: _handleLogin,  // Función al hacer clic
               style: ElevatedButton.styleFrom(
-                minimumSize: const Size(double.infinity, 50),  // Ancho completo
-                backgroundColor: Colors.red,
+                minimumSize: const Size(double.infinity, 50),  // Ancho completo, alto 50
+                backgroundColor: Colors.red,  // Fondo rojo
               ),
               child: const Text('Iniciar sesión', style: TextStyle(fontSize: 16)),
             ),
             const SizedBox(height: 16),
 
-            // Botón para ir al registro (aún sin funcionalidad)
+            // ========== BOTÓN: IR A REGISTRO ==========
             TextButton(
               onPressed: () {
-                // TODO: Navegar a pantalla de registro (próximo paso)
+                // Navega a la pantalla de registro
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (_) => const RegisterScreen()),
+                );
               },
               child: const Text('¿No tienes cuenta? Regístrate'),
             ),
