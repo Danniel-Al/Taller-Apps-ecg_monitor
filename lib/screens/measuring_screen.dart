@@ -1,5 +1,6 @@
 // lib/screens/measuring_screen.dart
 // PANTALLA DE MEDICIÓN ACTIVA (SIMULACIÓN DE LATIDOS)
+// CORREGIDO: Corazón centrado vertical y horizontalmente
 
 import 'dart:async';
 import 'package:flutter/material.dart';
@@ -12,17 +13,25 @@ class MeasuringScreen extends StatefulWidget {
   State<MeasuringScreen> createState() => _MeasuringScreenState();
 }
 
-class _MeasuringScreenState extends State<MeasuringScreen> {
-  int _timeRemaining = 30;  // 30 segundos de medición
-  int _heartBeats = 0;      // Latidos detectados (simulados)
+class _MeasuringScreenState extends State<MeasuringScreen>
+    with SingleTickerProviderStateMixin {
+  int _timeRemaining = 30; // 30 segundos de medición
+  int _heartBeats = 0; // Latidos detectados (simulados)
   bool _isMeasuring = true;
   late Timer _timer;
   late Timer _heartBeatSimulator;
+  late AnimationController _animationController;
 
   @override
   void initState() {
     super.initState();
     _startMeasurement();
+
+    // Animación para el latido del corazón
+    _animationController = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 300),
+    );
   }
 
   void _startMeasurement() {
@@ -43,15 +52,20 @@ class _MeasuringScreenState extends State<MeasuringScreen> {
         setState(() {
           _heartBeats++;
         });
-        _animateHeartBeat();  // Efecto visual
+        _animateHeartBeat(); // Efecto visual
       }
     });
+  }
+
+  void _animateHeartBeat() {
+    _animationController.forward(from: 0.0);
   }
 
   void _stopMeasurement() {
     _isMeasuring = false;
     _timer.cancel();
     _heartBeatSimulator.cancel();
+    _animationController.dispose();
 
     // Calcular frecuencia cardíaca: latidos en 30s * 2 = lpm
     int heartRate = (_heartBeats * 2).clamp(40, 180).toInt();
@@ -66,15 +80,11 @@ class _MeasuringScreenState extends State<MeasuringScreen> {
     }
   }
 
-  void _animateHeartBeat() {
-    // Efecto visual del latido (se puede implementar con animación)
-    setState(() {});
-  }
-
   @override
   void dispose() {
     _timer.cancel();
     _heartBeatSimulator.cancel();
+    _animationController.dispose();
     super.dispose();
   }
 
@@ -82,69 +92,85 @@ class _MeasuringScreenState extends State<MeasuringScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.white,
-      body: Padding(
-        padding: const EdgeInsets.all(24.0),
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            // Título
-            const Text(
-              'Midiendo frecuencia cardíaca',
-              style: TextStyle(
-                fontSize: 22,
-                fontWeight: FontWeight.bold,
-                color: Colors.red,
+      body: SafeArea(
+        child: Padding(
+          padding: const EdgeInsets.all(24.0),
+          child: Column(
+            children: [
+              // Título
+              const Text(
+                'Midiendo frecuencia cardíaca',
+                style: TextStyle(
+                  fontSize: 22,
+                  fontWeight: FontWeight.bold,
+                  color: Colors.red,
+                ),
+                textAlign: TextAlign.center,
               ),
-            ),
-            const SizedBox(height: 16),
+              const SizedBox(height: 8),
 
-            // Temporizador
-            Text(
-              '${_timeRemaining ~/ 60}:${(_timeRemaining % 60).toString().padLeft(2, '0')}',
-              style: const TextStyle(fontSize: 32, fontWeight: FontWeight.bold),
-            ),
-            const SizedBox(height: 32),
-
-            // Corazón animado (cambia de tamaño según latidos)
-            AnimatedContainer(
-              duration: const Duration(milliseconds: 200),
-              curve: Curves.easeInOut,
-              padding: EdgeInsets.all(_isMeasuring && _heartBeats % 2 == 0 ? 20 : 30),
-              decoration: BoxDecoration(
-                color: Colors.red.shade50,
-                shape: BoxShape.circle,
+              // Temporizador
+              Text(
+                '${_timeRemaining ~/ 60}:${(_timeRemaining % 60).toString().padLeft(2, '0')}',
+                style: const TextStyle(fontSize: 28, fontWeight: FontWeight.bold),
               ),
-              child: Icon(
-                Icons.favorite,
-                size: _isMeasuring && _heartBeats % 2 == 0 ? 60 : 80,
-                color: Colors.red,
+              const SizedBox(height: 8),
+
+              // Latidos detectados
+              Text(
+                'Latidos detectados: $_heartBeats',
+                style: const TextStyle(fontSize: 14, color: Colors.black54),
               ),
-            ),
-            const SizedBox(height: 32),
 
-            // Latidos detectados
-            Text(
-              'Latidos detectados: $_heartBeats',
-              style: const TextStyle(fontSize: 16, color: Colors.black54),
-            ),
-            const SizedBox(height: 16),
+              // ESPACIO FLEXIBLE para centrar el corazón
+              const Expanded(child: SizedBox()),
 
-            // Mensaje de instrucción
-            const Text(
-              'Mantén tus dedos quietos sobre el sensor',
-              style: TextStyle(fontSize: 14, color: Colors.black45),
-            ),
-            const SizedBox(height: 24),
-
-            // Botón cancelar (opcional)
-            TextButton(
-              onPressed: _stopMeasurement,
-              child: Text(
-                'Cancelar',
-                style: TextStyle(color: Colors.red.shade300),
+              // ========== CORAZÓN CENTRADO ==========
+              Center(
+                child: AnimatedBuilder(
+                  animation: _animationController,
+                  builder: (context, child) {
+                    final scale = 1.0 + (_animationController.value * 0.3);
+                    return Transform.scale(
+                      scale: scale,
+                      child: Container(
+                        padding: const EdgeInsets.all(20),
+                        decoration: BoxDecoration(
+                          color: Colors.red.shade50,
+                          shape: BoxShape.circle,
+                        ),
+                        child: const Icon(
+                          Icons.favorite,
+                          size: 80,
+                          color: Colors.red,
+                        ),
+                      ),
+                    );
+                  },
+                ),
               ),
-            ),
-          ],
+
+              // ESPACIO FLEXIBLE para mantener centrado
+              const Expanded(child: SizedBox()),
+
+              // Mensaje de instrucción
+              const Text(
+                'Mantén tus dedos quietos sobre el sensor',
+                style: TextStyle(fontSize: 14, color: Colors.black45),
+              ),
+              const SizedBox(height: 16),
+
+              // Botón cancelar
+              TextButton(
+                onPressed: _stopMeasurement,
+                child: Text(
+                  'Cancelar',
+                  style: TextStyle(color: Colors.red.shade300),
+                ),
+              ),
+              const SizedBox(height: 8),
+            ],
+          ),
         ),
       ),
     );
