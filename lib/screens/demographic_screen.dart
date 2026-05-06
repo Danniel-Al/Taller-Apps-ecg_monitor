@@ -1,6 +1,5 @@
 // lib/screens/demographic_screen.dart
 // PANTALLA DE DATOS DEMOGRÁFICOS (SOLO PRIMERA VEZ)
-// Diseño mejorado con tarjetas, iconos y botón blanco
 
 import 'package:flutter/material.dart';
 import '../utils/constants.dart';
@@ -27,23 +26,22 @@ class _DemographicScreenState extends State<DemographicScreen> {
   void _saveAndContinue() async {
     setState(() => _isLoading = true);
 
-    final userData = UserData(
-      username: widget.username,
-      hasCompletedDemographics: true,
-      ageRange: _selectedAgeRange,
-      gender: _selectedGender,
-      conditions: _selectedConditions,
-      symptoms: _selectedSymptoms,
-      medications: _selectedMedications,
-    );
-
     await Future.delayed(const Duration(milliseconds: 500));
 
     if (mounted) {
       setState(() => _isLoading = false);
       Navigator.pushReplacement(
         context,
-        MaterialPageRoute(builder: (_) => const HomeScreen()),
+        MaterialPageRoute(
+          builder: (_) => HomeScreen(
+            username: widget.username,
+            ageRange: _selectedAgeRange,
+            gender: _selectedGender,
+            conditions: _selectedConditions,
+            symptoms: _selectedSymptoms,
+            medications: _selectedMedications,
+          ),
+        ),
       );
     }
   }
@@ -136,7 +134,6 @@ class _DemographicScreenState extends State<DemographicScreen> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  // Mensaje de bienvenida personalizado
                   Container(
                     padding: const EdgeInsets.all(20),
                     decoration: BoxDecoration(
@@ -233,7 +230,6 @@ class _DemographicScreenState extends State<DemographicScreen> {
                       ),
                     ),
                   ),
-
                   const SizedBox(height: 20),
                 ],
               ),
