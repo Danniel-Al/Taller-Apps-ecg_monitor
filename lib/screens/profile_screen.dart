@@ -1,23 +1,23 @@
 // lib/screens/profile_screen.dart
 // PANTALLA DE PERFIL DEL USUARIO
-// Muestra los datos demográficos guardados
+// AHORA RECIBE EL USERNAME DESDE LOGIN
 
 import 'package:flutter/material.dart';
 import '../models/user_data.dart';
 import 'update_demographic_screen.dart';
 
 class ProfileScreen extends StatefulWidget {
-  const ProfileScreen({super.key});
+  final String username;  // ← NUEVO: Recibe el username
+
+  const ProfileScreen({super.key, required this.username});
 
   @override
   State<ProfileScreen> createState() => _ProfileScreenState();
 }
 
 class _ProfileScreenState extends State<ProfileScreen> {
-  // TODO: En el futuro, cargar datos reales desde SharedPreferences
-  // Por ahora, datos de ejemplo
   UserData _userData = UserData(
-    username: 'usuario_ejemplo',
+    username: '',
     hasCompletedDemographics: true,
     ageRange: 0,
     gender: 0,
@@ -34,10 +34,10 @@ class _ProfileScreenState extends State<ProfileScreen> {
 
   void _loadUserData() {
     // TODO: Cargar desde SharedPreferences
-    // Por ahora usamos datos de ejemplo
+    // Por ahora usamos el username recibido y datos de ejemplo
     setState(() {
       _userData = UserData(
-        username: 'usuario_ejemplo',
+        username: widget.username,  // ← USA EL USERNAME REAL
         hasCompletedDemographics: true,
         ageRange: 2,      // 46-60 años
         gender: 0,        // Femenino
@@ -49,7 +49,6 @@ class _ProfileScreenState extends State<ProfileScreen> {
   }
 
   void _editDemographics() async {
-    // Navegar a pantalla de edición
     final updated = await Navigator.push(
       context,
       MaterialPageRoute(
@@ -57,7 +56,6 @@ class _ProfileScreenState extends State<ProfileScreen> {
       ),
     );
 
-    // Si se actualizaron los datos, recargar
     if (updated != null && updated == true) {
       _loadUserData();
       ScaffoldMessenger.of(context).showSnackBar(
@@ -87,7 +85,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // Tarjeta de bienvenida
+            // Tarjeta de bienvenida con username real
             Container(
               padding: const EdgeInsets.all(20),
               decoration: BoxDecoration(
@@ -113,7 +111,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
-                        'Hola, ${_userData.username}',
+                        'Hola, ${_userData.username}',  // ← USERNAME REAL
                         style: const TextStyle(
                           fontSize: 20,
                           fontWeight: FontWeight.bold,
@@ -131,7 +129,6 @@ class _ProfileScreenState extends State<ProfileScreen> {
             ),
             const SizedBox(height: 24),
 
-            // Botón editar datos
             SizedBox(
               width: double.infinity,
               child: ElevatedButton.icon(
@@ -151,7 +148,6 @@ class _ProfileScreenState extends State<ProfileScreen> {
             ),
             const SizedBox(height: 24),
 
-            // Título de datos guardados
             const Text(
               'Tus datos actuales',
               style: TextStyle(
@@ -162,8 +158,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
             ),
             const SizedBox(height: 16),
 
-            // Tarjetas con datos
-            _buildInfoCard('👤 Nombre de usuario', _userData.username),
+            _buildInfoCard('👤 Nombre de usuario', _userData.username),  // ← USERNAME REAL
             _buildInfoCard('🎂 Edad', _getAgeRangeText()),
             _buildInfoCard('👤 Sexo', _getGenderText()),
             _buildInfoCard('❤️ Antecedentes', _getConditionsText()),
@@ -200,7 +195,6 @@ class _ProfileScreenState extends State<ProfileScreen> {
     );
   }
 
-  // Métodos auxiliares para convertir índices a texto
   String _getAgeRangeText() {
     const ranges = ['18-30 años', '31-45 años', '46-60 años', '61-75 años', '>75 años'];
     return ranges[_userData.ageRange];
