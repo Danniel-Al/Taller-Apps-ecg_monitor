@@ -1,5 +1,5 @@
 // lib/screens/home_screen.dart
-// PASA DATOS DEMOGRÁFICOS A LA PESTAÑA DE MEDICIÓN
+// PANTALLA PRINCIPAL CON PESTAÑAS (BOTTOM NAVIGATION BAR)
 
 import 'package:flutter/material.dart';
 import 'measurement_screen.dart';
@@ -35,6 +35,7 @@ class _HomeScreenState extends State<HomeScreen> {
   void initState() {
     super.initState();
     _screens = [
+      // Pasar todos los datos demográficos a MeasurementScreen
       MeasurementScreen(
         ageRange: widget.ageRange,
         gender: widget.gender,
@@ -78,4 +79,3 @@ class _HomeScreenState extends State<HomeScreen> {
     );
   }
 }
-

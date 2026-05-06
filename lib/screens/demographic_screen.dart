@@ -1,4 +1,3 @@
-// lib/screens/demographic_screen.dart
 // PANTALLA DE DATOS DEMOGRÁFICOS (SOLO PRIMERA VEZ)
 
 import 'package:flutter/material.dart';
@@ -237,3 +236,4 @@ class _DemographicScreenState extends State<DemographicScreen> {
     );
   }
 }
+
