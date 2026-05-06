@@ -130,5 +130,3 @@ class _CalibrationScreenState extends State<CalibrationScreen> {
     );
   }
 }
-
-

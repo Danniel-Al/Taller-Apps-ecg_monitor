@@ -1,5 +1,5 @@
-// lib/screens/result_screen.dart (VERSIÓN MODIFICADA)
-// Recibe FC y datos del usuario para mostrar recomendación y comparación
+// lib/screens/result_screen.dart
+// PANTALLA DE RESULTADOS: MUESTRA FRECUENCIA CARDÍACA Y ACCIONES
 
 import 'package:flutter/material.dart';
 import '../services/recommendation_service.dart';
@@ -24,7 +24,6 @@ class ResultScreen extends StatelessWidget {
     required this.symptoms,
     required this.medications,
   });
-<<<<<<< HEAD
 
   String _getStatusMessage() {
     if (heartRate < 60) return 'Bradicardia (Ritmo lento)';
@@ -37,8 +36,6 @@ class ResultScreen extends StatelessWidget {
     if (heartRate > 100) return Colors.red;
     return Colors.green;
   }
-=======
->>>>>>> 271b0d5dbf5fac301c4a25fca77c3225f95c5cd6
 
   @override
   Widget build(BuildContext context) {
@@ -65,14 +62,10 @@ class ResultScreen extends StatelessWidget {
               child: Icon(Icons.favorite, size: 64, color: _getStatusColor()),
             ),
             const SizedBox(height: 24),
-<<<<<<< HEAD
             Text(
               '$heartRate',
               style: const TextStyle(fontSize: 64, fontWeight: FontWeight.bold, color: Colors.red),
             ),
-=======
-            Text('$heartRate', style: const TextStyle(fontSize: 64, fontWeight: FontWeight.bold, color: Colors.red)),
->>>>>>> 271b0d5dbf5fac301c4a25fca77c3225f95c5cd6
             const Text('latidos por minuto', style: TextStyle(fontSize: 16, color: Colors.black54)),
             const SizedBox(height: 16),
             Container(
@@ -82,15 +75,11 @@ class ResultScreen extends StatelessWidget {
                 borderRadius: BorderRadius.circular(30),
                 border: Border.all(color: _getStatusColor().withOpacity(0.3)),
               ),
-<<<<<<< HEAD
               child: Text(
                 _getStatusMessage(),
                 textAlign: TextAlign.center,
                 style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: _getStatusColor()),
               ),
-=======
-              child: Text(_getStatusMessage(), textAlign: TextAlign.center, style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: _getStatusColor())),
->>>>>>> 271b0d5dbf5fac301c4a25fca77c3225f95c5cd6
             ),
             const SizedBox(height: 48),
             SizedBox(
@@ -160,18 +149,4 @@ class ResultScreen extends StatelessWidget {
       ),
     );
   }
-
-  String _getStatusMessage() {
-    if (heartRate < 60) return 'Bradicardia (Ritmo lento)';
-    if (heartRate > 100) return 'Taquicardia (Ritmo rápido)';
-    return 'Normal (Ritmo saludable)';
-  }
-
-  Color _getStatusColor() {
-    if (heartRate < 60) return Colors.orange;
-    if (heartRate > 100) return Colors.red;
-    return Colors.green;
-  }
 }
-
-
