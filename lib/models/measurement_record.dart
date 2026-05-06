@@ -28,7 +28,6 @@ class MeasurementRecord {
     required this.comparisonText,
   });
 
-  // Convertir a mapa para guardar en SharedPreferences
   Map<String, dynamic> toMap() {
     return {
       'id': id,
@@ -45,7 +44,6 @@ class MeasurementRecord {
     };
   }
 
-  // Crear desde mapa para cargar desde SharedPreferences
   factory MeasurementRecord.fromMap(Map<String, dynamic> map) {
     return MeasurementRecord(
       id: map['id'],

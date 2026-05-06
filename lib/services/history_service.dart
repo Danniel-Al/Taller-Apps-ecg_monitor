@@ -8,51 +8,31 @@ import '../models/measurement_record.dart';
 class HistoryService {
   static const String _historyKey = 'measurement_history';
 
-  // Guardar una nueva medición
   static Future<void> saveMeasurement(MeasurementRecord record) async {
     final prefs = await SharedPreferences.getInstance();
     final List<String>? existing = prefs.getStringList(_historyKey);
-    
     final List<String> updated = existing ?? [];
     updated.add(jsonEncode(record.toMap()));
-    
     await prefs.setStringList(_historyKey, updated);
   }
 
-  // Cargar todas las mediciones (ordenadas por fecha descendente)
   static Future<List<MeasurementRecord>> loadMeasurements() async {
     final prefs = await SharedPreferences.getInstance();
     final List<String>? stored = prefs.getStringList(_historyKey);
-    
     if (stored == null) return [];
-    
-    final records = stored.map((item) {
-      final Map<String, dynamic> map = jsonDecode(item);
-      return MeasurementRecord.fromMap(map);
-    }).toList();
-    
-    // Ordenar por fecha: más reciente primero
+    final records = stored.map((item) => MeasurementRecord.fromMap(jsonDecode(item))).toList();
     records.sort((a, b) => b.dateTime.compareTo(a.dateTime));
-    
     return records;
   }
 
-  // Eliminar una medición específica
   static Future<void> deleteMeasurement(String id) async {
     final prefs = await SharedPreferences.getInstance();
     final List<String>? stored = prefs.getStringList(_historyKey);
-    
     if (stored == null) return;
-    
-    final updated = stored.where((item) {
-      final map = jsonDecode(item);
-      return map['id'] != id;
-    }).toList();
-    
+    final updated = stored.where((item) => jsonDecode(item)['id'] != id).toList();
     await prefs.setStringList(_historyKey, updated);
   }
 
-  // Eliminar todo el historial
   static Future<void> clearHistory() async {
     final prefs = await SharedPreferences.getInstance();
     await prefs.remove(_historyKey);

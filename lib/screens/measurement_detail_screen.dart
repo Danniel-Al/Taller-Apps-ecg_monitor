@@ -1,4 +1,3 @@
-Nuevo archivo: lib/screens/measurement_detail_screen.dart
 // lib/screens/measurement_detail_screen.dart
 // DETALLE DE UNA MEDICIÓN GUARDADA
 
@@ -22,9 +21,12 @@ class MeasurementDetailScreen extends StatelessWidget {
 
   Color _getStatusColor() {
     if (record.heartRate < 60) return Colors.orange;
-    if (record.heartRate > 100) => Colors.red;
+    if (record.heartRate > 100) return Colors.red;
     return Colors.green;
   }
+
+  String _formatDate() => '${record.dateTime.day}/${record.dateTime.month}/${record.dateTime.year}';
+  String _formatTime() => '${record.dateTime.hour.toString().padLeft(2, '0')}:${record.dateTime.minute.toString().padLeft(2, '0')}';
 
   @override
   Widget build(BuildContext context) {
@@ -40,61 +42,38 @@ class MeasurementDetailScreen extends StatelessWidget {
         padding: const EdgeInsets.all(20),
         child: Column(
           children: [
-            // Fecha y hora
             Container(
               padding: const EdgeInsets.all(16),
-              decoration: BoxDecoration(
-                color: Colors.red.shade50,
-                borderRadius: BorderRadius.circular(16),
-              ),
+              decoration: BoxDecoration(color: Colors.red.shade50, borderRadius: BorderRadius.circular(16)),
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
                   const Icon(Icons.calendar_today, color: Colors.red),
                   const SizedBox(width: 8),
-                  Text(
-                    '${record.dateTime.day}/${record.dateTime.month}/${record.dateTime.year}',
-                    style: const TextStyle(fontSize: 16),
-                  ),
+                  Text(_formatDate(), style: const TextStyle(fontSize: 16)),
                   const SizedBox(width: 16),
                   const Icon(Icons.access_time, color: Colors.red),
                   const SizedBox(width: 8),
-                  Text(
-                    '${record.dateTime.hour.toString().padLeft(2, '0')}:${record.dateTime.minute.toString().padLeft(2, '0')}',
-                    style: const TextStyle(fontSize: 16),
-                  ),
+                  Text(_formatTime(), style: const TextStyle(fontSize: 16)),
                 ],
               ),
             ),
             const SizedBox(height: 24),
-
-            // Valor de FC
             Container(
               padding: const EdgeInsets.all(24),
-              decoration: BoxDecoration(
-                color: _getStatusColor().withOpacity(0.1),
-                shape: BoxShape.circle,
-              ),
+              decoration: BoxDecoration(color: _getStatusColor().withOpacity(0.1), shape: BoxShape.circle),
               child: Icon(Icons.favorite, size: 64, color: _getStatusColor()),
             ),
             const SizedBox(height: 16),
-            Text(
-              '${record.heartRate}',
-              style: const TextStyle(fontSize: 48, fontWeight: FontWeight.bold, color: Colors.red),
-            ),
+            Text('${record.heartRate}', style: const TextStyle(fontSize: 48, fontWeight: FontWeight.bold, color: Colors.red)),
             const Text('latidos por minuto', style: TextStyle(fontSize: 14, color: Colors.black54)),
             const SizedBox(height: 8),
             Container(
               padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 8),
-              decoration: BoxDecoration(
-                color: _getStatusColor().withOpacity(0.1),
-                borderRadius: BorderRadius.circular(20),
-              ),
+              decoration: BoxDecoration(color: _getStatusColor().withOpacity(0.1), borderRadius: BorderRadius.circular(20)),
               child: Text(_getStatusText(), style: TextStyle(fontSize: 14, color: _getStatusColor())),
             ),
             const SizedBox(height: 24),
-
-            // Botones
             Row(
               children: [
                 Expanded(
@@ -149,14 +128,9 @@ class MeasurementDetailScreen extends StatelessWidget {
               ],
             ),
             const SizedBox(height: 24),
-
-            // Resumen guardado
             Container(
               padding: const EdgeInsets.all(16),
-              decoration: BoxDecoration(
-                color: Colors.grey.shade50,
-                borderRadius: BorderRadius.circular(16),
-              ),
+              decoration: BoxDecoration(color: Colors.grey.shade50, borderRadius: BorderRadius.circular(16)),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
@@ -164,7 +138,7 @@ class MeasurementDetailScreen extends StatelessWidget {
                   const Divider(),
                   _buildInfoRow('Comparación', record.comparisonText),
                   const SizedBox(height: 8),
-                  Text('Recomendación:', style: const TextStyle(fontWeight: FontWeight.w500)),
+                  const Text('Recomendación:', style: TextStyle(fontWeight: FontWeight.w500)),
                   const SizedBox(height: 4),
                   Text(record.recommendation, style: const TextStyle(fontSize: 13)),
                 ],

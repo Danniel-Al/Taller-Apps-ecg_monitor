@@ -1,3 +1,6 @@
+// lib/screens/profile_screen.dart
+// PANTALLA DE PERFIL DEL USUARIO
+
 import 'package:flutter/material.dart';
 import '../models/user_data.dart';
 import 'update_demographic_screen.dart';
@@ -11,15 +14,7 @@ class ProfileScreen extends StatefulWidget {
 }
 
 class _ProfileScreenState extends State<ProfileScreen> {
-  UserData _userData = UserData(
-    username: '',
-    hasCompletedDemographics: true,
-    ageRange: 0,
-    gender: 0,
-    conditions: 0,
-    symptoms: 0,
-    medications: 0,
-  );
+  UserData _userData = UserData(username: '');
 
   @override
   void initState() {
@@ -41,12 +36,10 @@ class _ProfileScreenState extends State<ProfileScreen> {
     });
   }
 
-  void _editDemographics() async {
+  Future<void> _editDemographics() async {
     final updated = await Navigator.push(
       context,
-      MaterialPageRoute(
-        builder: (_) => UpdateDemographicScreen(userData: _userData),
-      ),
+      MaterialPageRoute(builder: (_) => UpdateDemographicScreen(userData: _userData)),
     );
     if (updated == true) {
       _loadUserData();
@@ -55,6 +48,12 @@ class _ProfileScreenState extends State<ProfileScreen> {
       );
     }
   }
+
+  String _getAgeRangeText() => const ['18-30 años', '31-45 años', '46-60 años', '61-75 años', '>75 años'][_userData.ageRange];
+  String _getGenderText() => const ['Femenino', 'Masculino', 'Prefiero no decirlo'][_userData.gender];
+  String _getConditionsText() => const ['Ninguno', 'Hipertensión', 'Insuficiencia cardíaca', 'Infarto previo', 'Arritmias', 'Cardiopatía congénita'][_userData.conditions];
+  String _getSymptomsText() => const ['Ningún síntoma', 'Palpitaciones', 'Dolor en el pecho', 'Mareos', 'Falta de aire'][_userData.symptoms];
+  String _getMedicationsText() => const ['Ninguno', 'Betabloqueadores', 'Antidepresivos', 'Antiarrítmicos', 'Diuréticos'][_userData.medications];
 
   @override
   Widget build(BuildContext context) {
@@ -72,9 +71,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
             Container(
               padding: const EdgeInsets.all(20),
               decoration: BoxDecoration(
-                gradient: LinearGradient(
-                  colors: [Colors.red.shade50, Colors.red.shade100],
-                ),
+                gradient: LinearGradient(colors: [Colors.red.shade50, Colors.red.shade100]),
                 borderRadius: BorderRadius.circular(20),
               ),
               child: Row(
@@ -138,10 +135,4 @@ class _ProfileScreenState extends State<ProfileScreen> {
       ),
     );
   }
-
-  String _getAgeRangeText() => const ['18-30 años', '31-45 años', '46-60 años', '61-75 años', '>75 años'][_userData.ageRange];
-  String _getGenderText() => const ['Femenino', 'Masculino', 'Prefiero no decirlo'][_userData.gender];
-  String _getConditionsText() => const ['Ninguno', 'Hipertensión', 'Insuficiencia cardíaca', 'Infarto previo', 'Arritmias', 'Cardiopatía congénita'][_userData.conditions];
-  String _getSymptomsText() => const ['Ningún síntoma', 'Palpitaciones', 'Dolor en el pecho', 'Mareos', 'Falta de aire'][_userData.symptoms];
-  String _getMedicationsText() => const ['Ninguno', 'Betabloqueadores', 'Antidepresivos', 'Antiarrítmicos', 'Diuréticos'][_userData.medications];
 }

@@ -15,6 +15,7 @@ class LoginScreen extends StatefulWidget {
 class _LoginScreenState extends State<LoginScreen> {
   final TextEditingController _usernameController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
+  bool _obscurePassword = true;
 
   void _handleLogin() {
     final username = _usernameController.text.trim();
@@ -58,7 +59,6 @@ class _LoginScreenState extends State<LoginScreen> {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            // Icono principal
             Container(
               padding: const EdgeInsets.all(20),
               decoration: BoxDecoration(
@@ -73,7 +73,6 @@ class _LoginScreenState extends State<LoginScreen> {
               style: TextStyle(fontSize: 28, fontWeight: FontWeight.bold, color: Colors.red),
             ),
             const SizedBox(height: 40),
-            // Campo usuario
             TextField(
               controller: _usernameController,
               decoration: InputDecoration(
@@ -85,20 +84,22 @@ class _LoginScreenState extends State<LoginScreen> {
               ),
             ),
             const SizedBox(height: 16),
-            // Campo contraseña
             TextField(
               controller: _passwordController,
-              obscureText: true,
+              obscureText: _obscurePassword,
               decoration: InputDecoration(
                 labelText: 'Contraseña',
                 border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
                 prefixIcon: const Icon(Icons.lock),
+                suffixIcon: IconButton(
+                  icon: Icon(_obscurePassword ? Icons.visibility_off : Icons.visibility, color: Colors.grey),
+                  onPressed: () => setState(() => _obscurePassword = !_obscurePassword),
+                ),
                 filled: true,
                 fillColor: Colors.grey.shade50,
               ),
             ),
             const SizedBox(height: 24),
-            // Botón iniciar sesión
             SizedBox(
               width: double.infinity,
               child: ElevatedButton(
@@ -111,27 +112,14 @@ class _LoginScreenState extends State<LoginScreen> {
                     borderRadius: BorderRadius.circular(30),
                     side: BorderSide(color: Colors.red.shade300, width: 1.5),
                   ),
-                  elevation: 2,
                 ),
-                child: const Text(
-                  'Iniciar sesión',
-                  style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
-                ),
+                child: const Text('Iniciar sesión', style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
               ),
             ),
             const SizedBox(height: 16),
-            // Botón ir a registro
             TextButton(
-              onPressed: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(builder: (_) => const RegisterScreen()),
-                );
-              },
-              child: Text(
-                '¿No tienes cuenta? Regístrate',
-                style: TextStyle(color: Colors.red.shade700),
-              ),
+              onPressed: () => Navigator.push(context, MaterialPageRoute(builder: (_) => const RegisterScreen())),
+              child: Text('¿No tienes cuenta? Regístrate', style: TextStyle(color: Colors.red.shade700)),
             ),
           ],
         ),

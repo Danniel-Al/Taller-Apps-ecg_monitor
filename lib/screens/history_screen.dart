@@ -54,6 +54,9 @@ class _HistoryScreenState extends State<HistoryScreen> {
     return Colors.green;
   }
 
+  String _formatDate(DateTime date) => '${date.day}/${date.month}/${date.year}';
+  String _formatTime(DateTime date) => '${date.hour.toString().padLeft(2, '0')}:${date.minute.toString().padLeft(2, '0')}';
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -120,10 +123,7 @@ class _HistoryScreenState extends State<HistoryScreen> {
                           '${record.heartRate} lpm - ${_getStatusText(record.heartRate)}',
                           style: const TextStyle(fontWeight: FontWeight.bold),
                         ),
-                        subtitle: Text(
-                          '${_formatDate(record.dateTime)} • ${_formatTime(record.dateTime)}',
-                          style: const TextStyle(fontSize: 12),
-                        ),
+                        subtitle: Text('${_formatDate(record.dateTime)} • ${_formatTime(record.dateTime)}'),
                         trailing: IconButton(
                           icon: const Icon(Icons.delete_outline, color: Colors.grey),
                           onPressed: () => _deleteRecord(record.id),
@@ -141,13 +141,5 @@ class _HistoryScreenState extends State<HistoryScreen> {
                   },
                 ),
     );
-  }
-
-  String _formatDate(DateTime date) {
-    return '${date.day}/${date.month}/${date.year}';
-  }
-
-  String _formatTime(DateTime date) {
-    return '${date.hour.toString().padLeft(2, '0')}:${date.minute.toString().padLeft(2, '0')}';
   }
 }

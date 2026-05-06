@@ -4,11 +4,11 @@
 class UserData {
   String username;
   bool hasCompletedDemographics;
-  int ageRange;      // 0: 18-30, 1: 31-45, 2: 46-60, 3: 61-75, 4: >75
-  int gender;        // 0: Femenino, 1: Masculino, 2: Prefiero no decirlo
-  int conditions;    // 0: Ninguno, 1: Hipertensión, 2: Insuficiencia cardíaca, etc.
-  int symptoms;      // 0: Ninguno, 1: Palpitaciones, 2: Dolor pecho, etc.
-  int medications;   // 0: Ninguno, 1: Betabloqueadores, 2: Antidepresivos, etc.
+  int ageRange;
+  int gender;
+  int conditions;
+  int symptoms;
+  int medications;
 
   UserData({
     required this.username,
@@ -44,4 +44,7 @@ class UserData {
     );
   }
 }
+
+
+
 
