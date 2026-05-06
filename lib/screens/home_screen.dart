@@ -1,13 +1,9 @@
-// lib/screens/home_screen.dart
-// PASA EL USERNAME A LA PANTALLA DE PERFIL
-
 import 'package:flutter/material.dart';
 import 'measurement_screen.dart';
 import 'profile_screen.dart';
 
 class HomeScreen extends StatefulWidget {
-  final String username;  // ← NUEVO: Recibe username
-
+  final String username;
   const HomeScreen({super.key, required this.username});
 
   @override
@@ -16,7 +12,6 @@ class HomeScreen extends StatefulWidget {
 
 class _HomeScreenState extends State<HomeScreen> {
   int _selectedIndex = 0;
-
   late final List<Widget> _screens;
 
   @override
@@ -24,7 +19,7 @@ class _HomeScreenState extends State<HomeScreen> {
     super.initState();
     _screens = [
       const MeasurementScreen(),
-      ProfileScreen(username: widget.username),  // ← PASA EL USERNAME
+      ProfileScreen(username: widget.username),
     ];
   }
 
@@ -44,17 +39,9 @@ class _HomeScreenState extends State<HomeScreen> {
         onTap: _onItemTapped,
         selectedItemColor: Colors.red,
         unselectedItemColor: Colors.grey,
-        selectedFontSize: 12,
-        unselectedFontSize: 12,
         items: const [
-          BottomNavigationBarItem(
-            icon: Icon(Icons.favorite),
-            label: 'Tomar medición',
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.person),
-            label: 'Perfil',
-          ),
+          BottomNavigationBarItem(icon: Icon(Icons.favorite), label: 'Tomar medición'),
+          BottomNavigationBarItem(icon: Icon(Icons.person), label: 'Perfil'),
         ],
       ),
     );
