@@ -1,27 +1,27 @@
-// lib/screens/home_screen.dart
-// PANTALLA PRINCIPAL CON PESTAÑAS (BOTTOM NAVIGATION BAR)
-// Pestaña 1: Tomar medición
-// Pestaña 2: Perfil
-
 import 'package:flutter/material.dart';
 import 'measurement_screen.dart';
 import 'profile_screen.dart';
 
 class HomeScreen extends StatefulWidget {
-  const HomeScreen({super.key});
+  final String username;
+  const HomeScreen({super.key, required this.username});
 
   @override
   State<HomeScreen> createState() => _HomeScreenState();
 }
 
 class _HomeScreenState extends State<HomeScreen> {
-  int _selectedIndex = 0;  // 0: Medición, 1: Perfil
+  int _selectedIndex = 0;
+  late final List<Widget> _screens;
 
-  // Lista de pantallas para cada pestaña
-  final List<Widget> _screens = [
-    const MeasurementScreen(),   // Pestaña de medición
-    const ProfileScreen(),       // Pestaña de perfil (la crearemos después)
-  ];
+  @override
+  void initState() {
+    super.initState();
+    _screens = [
+      const MeasurementScreen(),
+      ProfileScreen(username: widget.username),
+    ];
+  }
 
   void _onItemTapped(int index) {
     setState(() {
@@ -39,20 +39,11 @@ class _HomeScreenState extends State<HomeScreen> {
         onTap: _onItemTapped,
         selectedItemColor: Colors.red,
         unselectedItemColor: Colors.grey,
-        selectedFontSize: 12,
-        unselectedFontSize: 12,
         items: const [
-          BottomNavigationBarItem(
-            icon: Icon(Icons.favorite),
-            label: 'Tomar medición',
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.person),
-            label: 'Perfil',
-          ),
+          BottomNavigationBarItem(icon: Icon(Icons.favorite), label: 'Tomar medición'),
+          BottomNavigationBarItem(icon: Icon(Icons.person), label: 'Perfil'),
         ],
       ),
     );
   }
 }
-
