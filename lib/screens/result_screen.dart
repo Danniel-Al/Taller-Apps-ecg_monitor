@@ -1,38 +1,36 @@
-// lib/screens/result_screen.dart
-// PANTALLA DE RESULTADOS: MUESTRA FRECUENCIA CARDÍACA Y ACCIONES
+// lib/screens/result_screen.dart (VERSIÓN MODIFICADA)
+// Recibe FC y datos del usuario para mostrar recomendación y comparación
 
 import 'package:flutter/material.dart';
+import '../services/recommendation_service.dart';
+import '../services/comparison_service.dart';
+import 'recommendation_screen.dart';
+import 'comparison_screen.dart';
 
 class ResultScreen extends StatelessWidget {
   final int heartRate;
+  final int ageRange;
+  final int gender;
+  final int conditions;
+  final int symptoms;
+  final int medications;
 
-  const ResultScreen({super.key, required this.heartRate});
-
-  String _getStatusMessage() {
-    if (heartRate < 60) {
-      return 'Bradicardia\n(Ritmo lento)';
-    } else if (heartRate > 100) {
-      return 'Taquicardia\n(Ritmo rápido)';
-    } else {
-      return 'Normal\n(Ritmo saludable)';
-    }
-  }
-
-  Color _getStatusColor() {
-    if (heartRate < 60) return Colors.orange;
-    if (heartRate > 100) return Colors.red;
-    return Colors.green;
-  }
+  const ResultScreen({
+    super.key,
+    required this.heartRate,
+    required this.ageRange,
+    required this.gender,
+    required this.conditions,
+    required this.symptoms,
+    required this.medications,
+  });
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.white,
       appBar: AppBar(
-        title: const Text(
-          'Resultado',
-          style: TextStyle(color: Colors.white),
-        ),
+        title: const Text('Resultado', style: TextStyle(color: Colors.white)),
         backgroundColor: Colors.red,
         elevation: 0,
         centerTitle: true,
@@ -43,37 +41,18 @@ class ResultScreen extends StatelessWidget {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            // Icono de corazón
             Container(
               padding: const EdgeInsets.all(20),
               decoration: BoxDecoration(
                 color: _getStatusColor().withOpacity(0.1),
                 shape: BoxShape.circle,
               ),
-              child: Icon(
-                Icons.favorite,
-                size: 64,
-                color: _getStatusColor(),
-              ),
+              child: Icon(Icons.favorite, size: 64, color: _getStatusColor()),
             ),
             const SizedBox(height: 24),
-
-            // Frecuencia cardíaca
-            Text(
-              '$heartRate',
-              style: const TextStyle(
-                fontSize: 64,
-                fontWeight: FontWeight.bold,
-                color: Colors.red,
-              ),
-            ),
-            const Text(
-              'latidos por minuto',
-              style: TextStyle(fontSize: 16, color: Colors.black54),
-            ),
+            Text('$heartRate', style: const TextStyle(fontSize: 64, fontWeight: FontWeight.bold, color: Colors.red)),
+            const Text('latidos por minuto', style: TextStyle(fontSize: 16, color: Colors.black54)),
             const SizedBox(height: 16),
-
-            // Estado
             Container(
               padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
               decoration: BoxDecoration(
@@ -81,27 +60,28 @@ class ResultScreen extends StatelessWidget {
                 borderRadius: BorderRadius.circular(30),
                 border: Border.all(color: _getStatusColor().withOpacity(0.3)),
               ),
-              child: Text(
-                _getStatusMessage(),
-                textAlign: TextAlign.center,
-                style: TextStyle(
-                  fontSize: 16,
-                  fontWeight: FontWeight.bold,
-                  color: _getStatusColor(),
-                ),
-              ),
+              child: Text(_getStatusMessage(), textAlign: TextAlign.center, style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: _getStatusColor())),
             ),
             const SizedBox(height: 48),
-
-            // Botón: Ver recomendación
             SizedBox(
               width: double.infinity,
               child: ElevatedButton(
                 onPressed: () {
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(
-                      content: Text('Próximamente: recomendaciones personalizadas'),
-                      backgroundColor: Colors.green,
+                  final recommendation = RecommendationService.getRecommendation(
+                    heartRate: heartRate,
+                    ageRange: ageRange,
+                    gender: gender,
+                    conditions: conditions,
+                    symptoms: symptoms,
+                    medications: medications,
+                  );
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (_) => RecommendationScreen(
+                        heartRate: heartRate,
+                        recommendation: recommendation,
+                      ),
                     ),
                   );
                 },
@@ -109,28 +89,25 @@ class ResultScreen extends StatelessWidget {
                   backgroundColor: Colors.red,
                   foregroundColor: Colors.white,
                   padding: const EdgeInsets.symmetric(vertical: 14),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(30),
-                  ),
-                  elevation: 2,
+                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(30)),
                 ),
-                child: const Text(
-                  'Ver recomendación',
-                  style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
-                ),
+                child: const Text('Ver recomendación', style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
               ),
             ),
             const SizedBox(height: 16),
-
-            // Botón: Comparar con demografía
             SizedBox(
               width: double.infinity,
               child: OutlinedButton(
                 onPressed: () {
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(
-                      content: Text('Próximamente: comparación con datos demográficos'),
-                      backgroundColor: Colors.blue,
+                  final comparison = ComparisonService.compare(
+                    heartRate: heartRate,
+                    ageRange: ageRange,
+                    gender: gender,
+                  );
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (_) => ComparisonScreen(comparison: comparison),
                     ),
                   );
                 },
@@ -138,31 +115,31 @@ class ResultScreen extends StatelessWidget {
                   foregroundColor: Colors.red,
                   side: BorderSide(color: Colors.red.shade300),
                   padding: const EdgeInsets.symmetric(vertical: 14),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(30),
-                  ),
+                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(30)),
                 ),
-                child: const Text(
-                  'Comparar con demografía',
-                  style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
-                ),
+                child: const Text('Comparar con demografía', style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
               ),
             ),
             const SizedBox(height: 16),
-
-            // Botón: Nueva medición
             TextButton(
-              onPressed: () {
-                Navigator.popUntil(context, (route) => route.isFirst);
-              },
-              child: Text(
-                'Nueva medición',
-                style: TextStyle(color: Colors.red.shade700),
-              ),
+              onPressed: () => Navigator.popUntil(context, (route) => route.isFirst),
+              child: Text('Nueva medición', style: TextStyle(color: Colors.red.shade700)),
             ),
           ],
         ),
       ),
     );
+  }
+
+  String _getStatusMessage() {
+    if (heartRate < 60) return 'Bradicardia (Ritmo lento)';
+    if (heartRate > 100) return 'Taquicardia (Ritmo rápido)';
+    return 'Normal (Ritmo saludable)';
+  }
+
+  Color _getStatusColor() {
+    if (heartRate < 60) return Colors.orange;
+    if (heartRate > 100) return Colors.red;
+    return Colors.green;
   }
 }
