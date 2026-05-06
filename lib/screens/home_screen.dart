@@ -1,10 +1,27 @@
+// lib/screens/home_screen.dart
+// PASA DATOS DEMOGRÁFICOS A LA PESTAÑA DE MEDICIÓN
+
 import 'package:flutter/material.dart';
 import 'measurement_screen.dart';
 import 'profile_screen.dart';
 
 class HomeScreen extends StatefulWidget {
   final String username;
-  const HomeScreen({super.key, required this.username});
+  final int ageRange;
+  final int gender;
+  final int conditions;
+  final int symptoms;
+  final int medications;
+
+  const HomeScreen({
+    super.key,
+    required this.username,
+    required this.ageRange,
+    required this.gender,
+    required this.conditions,
+    required this.symptoms,
+    required this.medications,
+  });
 
   @override
   State<HomeScreen> createState() => _HomeScreenState();
@@ -18,7 +35,13 @@ class _HomeScreenState extends State<HomeScreen> {
   void initState() {
     super.initState();
     _screens = [
-      const MeasurementScreen(),
+      MeasurementScreen(
+        ageRange: widget.ageRange,
+        gender: widget.gender,
+        conditions: widget.conditions,
+        symptoms: widget.symptoms,
+        medications: widget.medications,
+      ),
       ProfileScreen(username: widget.username),
     ];
   }
@@ -39,11 +62,20 @@ class _HomeScreenState extends State<HomeScreen> {
         onTap: _onItemTapped,
         selectedItemColor: Colors.red,
         unselectedItemColor: Colors.grey,
+        selectedFontSize: 12,
+        unselectedFontSize: 12,
         items: const [
-          BottomNavigationBarItem(icon: Icon(Icons.favorite), label: 'Tomar medición'),
-          BottomNavigationBarItem(icon: Icon(Icons.person), label: 'Perfil'),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.favorite),
+            label: 'Tomar medición',
+          ),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.person),
+            label: 'Perfil',
+          ),
         ],
       ),
     );
   }
 }
+
