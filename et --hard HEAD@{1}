@@ -1,0 +1,20 @@
+[33m7840280[m[33m ([m[1;36mHEAD[m[33m -> [m[1;32mmain[m[33m, [m[1;31morigin/main[m[33m, [m[1;31morigin/HEAD[m[33m)[m HEAD@{0}: reset: moving to HEAD~1
+[33m9c880d9[m HEAD@{1}: pull: Fast-forward
+[33ma1ef93f[m HEAD@{2}: commit: Correcciones de código para corroborar funcionamiento hasta el momento
+[33m3dbd601[m HEAD@{3}: commit: Agrega pantalla de historial con lista de mediciones guardadas y pantalla de detalles
+[33m6ff0656[m HEAD@{4}: pull: Fast-forward
+[33m8d9b48f[m HEAD@{5}: reset: moving to 8d9b48f
+[33mc913fb4[m HEAD@{6}: reset: moving to c913fb4
+[33mc913fb4[m HEAD@{7}: reset: moving to c913fb4
+[33m085bd77[m HEAD@{8}: reset: moving to HEAD~3
+[33mc913fb4[m HEAD@{9}: reset: moving to c913fb4f6431bb1d9bbf7087a692ca2816ef818c
+[33mc913fb4[m HEAD@{10}: pull: Fast-forward
+[33m271b0d5[m HEAD@{11}: pull: Fast-forward
+[33m8d9b48f[m HEAD@{12}: commit: Agregué apartado para funcionamiento de recomendaciones y comparación demográfica
+[33m763b06a[m HEAD@{13}: commit: Agregué visibilidad de contraseña en Registro, registré pestaña de medición y corregí errores de navegación
+[33m1e288b4[m HEAD@{14}: commit: Agregué visibilidad de contraseña en login y corregí navegación
+[33mef25d9d[m HEAD@{15}: pull: Fast-forward
+[33mff4e7d9[m HEAD@{16}: commit: Mejora de diseño estético de pantalla de inicio, de registro, datos demograficos
+[33mdb750d5[m HEAD@{17}: commit: Mejora diseño estético de datos de usuarios y constantes
+[33m136c53d[m HEAD@{18}: commit: Agruegé modelo de datos para el usuario, constantes, datos demográficos y una pantalla temporal de inicio
+[33mb1a0be3[m HEAD@{19}: clone: from https://github.com/Danniel-Al/Taller-Apps-ecg_monitor.git
