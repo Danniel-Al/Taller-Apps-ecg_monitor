@@ -1,12 +1,12 @@
 // lib/models/user_data.dart
-// MODELO DE DATOS DEMOGRÁFICOS DEL USUARIO - CON MÚLTIPLES ANTECEDENTES
+
 
 class UserData {
   String username;
   bool hasCompletedDemographics;
   int ageRange;
   int gender;
-  List<int> conditions;      // AHORA ES LISTA (múltiples selecciones)
+  List<int> conditions;
   int symptoms;
   int medications;
 
@@ -44,21 +44,30 @@ class UserData {
     );
   }
 
-  // Obtener texto de los antecedentes seleccionados
   String getConditionsText() {
-    if (conditions.isEmpty) return 'Ninguno';
-    final List<String> conditionNames = [];
-    for (int i in conditions) {
-      if (i == 0) conditionNames.add('Hipertensión');
-      else if (i == 1) conditionNames.add('Diabetes');
-      else if (i == 2) conditionNames.add('Colesterol alto');
-      else if (i == 3) conditionNames.add('Insuficiencia cardíaca');
-      else if (i == 4) conditionNames.add('Infarto previo');
-      else if (i == 5) conditionNames.add('Arritmias');
-      else if (i == 6) conditionNames.add('Cardiopatía congénita');
-      else if (i == 7) conditionNames.add('Tabaquismo');
+    if (conditions.isEmpty) {
+      return 'Ninguno';
     }
-    return conditionNames.join(', ');
+    final List<String> names = [];
+    for (int i in conditions) {
+      if (i == 0) {
+        names.add('Hipertensión');
+      } else if (i == 1) {
+        names.add('Diabetes');
+      } else if (i == 2) {
+        names.add('Colesterol alto');
+      } else if (i == 3) {
+        names.add('Insuficiencia cardíaca');
+      } else if (i == 4) {
+        names.add('Infarto previo');
+      } else if (i == 5) {
+        names.add('Arritmias');
+      } else if (i == 6) {
+        names.add('Cardiopatía congénita');
+      } else if (i == 7) {
+        names.add('Tabaquismo');
+      }
+    }
+    return names.join(', ');
   }
 }
-

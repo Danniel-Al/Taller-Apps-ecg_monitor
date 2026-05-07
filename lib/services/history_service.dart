@@ -1,40 +1,59 @@
-// lib/services/history_service.dart
-// SERVICIO PARA GUARDAR Y CARGAR EL HISTORIAL DE MEDICIONES
+// lib/services/memory_history_service.dart
 
-import 'dart:convert';
-import 'package:shared_preferences/shared_preferences.dart';
+
 import '../models/measurement_record.dart';
 
-class HistoryService {
-  static const String _historyKey = 'measurement_history';
+class MemoryHistoryService {
 
-  static Future<void> saveMeasurement(MeasurementRecord record) async {
-    final prefs = await SharedPreferences.getInstance();
-    final List<String>? existing = prefs.getStringList(_historyKey);
-    final List<String> updated = existing ?? [];
-    updated.add(jsonEncode(record.toMap()));
-    await prefs.setStringList(_historyKey, updated);
+  static final Map<String, List<MeasurementRecord>> _userRecords = {};
+
+
+  static String? _currentUser;
+
+
+  static void setCurrentUser(String username) {
+    _currentUser = username;
+    if (!_userRecords.containsKey(username)) {
+      _userRecords[username] = [];
+    }
   }
 
-  static Future<List<MeasurementRecord>> loadMeasurements() async {
-    final prefs = await SharedPreferences.getInstance();
-    final List<String>? stored = prefs.getStringList(_historyKey);
-    if (stored == null) return [];
-    final records = stored.map((item) => MeasurementRecord.fromMap(jsonDecode(item))).toList();
-    records.sort((a, b) => b.dateTime.compareTo(a.dateTime));
-    return records;
+
+  static void clearCurrentUser() {
+    _currentUser = null;
   }
 
-  static Future<void> deleteMeasurement(String id) async {
-    final prefs = await SharedPreferences.getInstance();
-    final List<String>? stored = prefs.getStringList(_historyKey);
-    if (stored == null) return;
-    final updated = stored.where((item) => jsonDecode(item)['id'] != id).toList();
-    await prefs.setStringList(_historyKey, updated);
+
+  static void saveMeasurement(MeasurementRecord record) {
+    final String? current = _currentUser;
+    if (current == null) return;
+    if (!_userRecords.containsKey(current)) {
+      _userRecords[current] = [];
+    }
+    _userRecords[current]!.add(record);
+    _userRecords[current]!.sort((a, b) => b.dateTime.compareTo(a.dateTime));
   }
 
-  static Future<void> clearHistory() async {
-    final prefs = await SharedPreferences.getInstance();
-    await prefs.remove(_historyKey);
+
+  static List<MeasurementRecord> getMeasurements() {
+    final String? current = _currentUser;
+    if (current == null) return [];
+    return List.from(_userRecords[current] ?? []);
+  }
+
+
+  static void deleteMeasurement(String id) {
+    final String? current = _currentUser;
+    if (current == null) return;
+    _userRecords[current]?.removeWhere((record) => record.id == id);
+
+
+  }
+
+
+  static void clearHistory() {
+    final String? current = _currentUser;
+    if (current == null) return;
+    _userRecords[current] = [];
   }
 }

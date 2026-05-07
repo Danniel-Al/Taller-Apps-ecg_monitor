@@ -17,6 +17,7 @@ const List<String> genders = [
 
 // Antecedentes cardíacos - AHORA CON TABAQUISMO
 const List<String> conditionsList = [
+
   'Hipertensión arterial',
   'Diabetes mellitus',
   'Colesterol alto (dislipidemia)',

@@ -1,6 +1,4 @@
 // lib/screens/result_screen.dart
-// CON CORRELACIÓN DE FACTORES Y ANTECEDENTES MÚLTIPLES
-
 import 'package:flutter/material.dart';
 import '../services/recommendation_service.dart';
 import '../services/comparison_service.dart';
@@ -43,14 +41,17 @@ class _ResultScreenState extends State<ResultScreen> {
   @override
   void initState() {
     super.initState();
+    
+    // Línea 48 aprox - aquí está el error si no coincide el tipo
     _recommendation = RecommendationService.getDetailedRecommendation(
       heartRate: widget.heartRate,
       ageRange: widget.ageRange,
       gender: widget.gender,
-      conditions: widget.conditions,
+      conditions: widget.conditions,  // ← List<int>
       symptoms: widget.symptoms,
       medications: widget.medications,
     );
+    
     _comparison = ComparisonService.getDetailedComparison(
       heartRate: widget.heartRate,
       ageRange: widget.ageRange,
@@ -58,6 +59,7 @@ class _ResultScreenState extends State<ResultScreen> {
       conditions: widget.conditions,
       symptoms: widget.symptoms,
     );
+    
     _correlationAnalysis = CorrelationService.getCorrelationAnalysis(
       heartRate: widget.heartRate,
       ageRange: widget.ageRange,
@@ -85,85 +87,7 @@ class _ResultScreenState extends State<ResultScreen> {
     MemoryHistoryService.saveMeasurement(record);
   }
 
-  void _goToCorrelation() {
-    showModalBottomSheet(
-      context: context,
-      isScrollControlled: true,
-      shape: const RoundedRectangleBorder(
-        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
-      ),
-      builder: (context) => DraggableScrollableSheet(
-        initialChildSize: 0.6,
-        minChildSize: 0.4,
-        maxChildSize: 0.9,
-        expand: false,
-        builder: (context, scrollController) => Container(
-          padding: const EdgeInsets.all(20),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              const Center(
-                child: SizedBox(
-                  width: 40,
-                  height: 4,
-                  child: DecoratedBox(
-                    decoration: BoxDecoration(
-                      color: Colors.grey,
-                      borderRadius: BorderRadius.all(Radius.circular(2)),
-                    ),
-                  ),
-                ),
-              ),
-              const SizedBox(height: 20),
-              const Text(
-                '🔬 Correlación de factores con tu FC',
-                style: TextStyle(
-                  fontSize: 20,
-                  fontWeight: FontWeight.bold,
-                  color: Colors.red,
-                ),
-              ),
-              const SizedBox(height: 16),
-              Expanded(
-                child: SingleChildScrollView(
-                  controller: scrollController,
-                  child: Text(
-                    _correlationAnalysis,
-                    style: const TextStyle(fontSize: 14, height: 1.5),
-                  ),
-                ),
-              ),
-              const SizedBox(height: 16),
-              SizedBox(
-                width: double.infinity,
-                child: ElevatedButton(
-                  onPressed: () => Navigator.pop(context),
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: Colors.red,
-                    foregroundColor: Colors.white,
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(30),
-                    ),
-                  ),
-                  child: const Text('Cerrar'),
-                ),
-              ),
-            ],
-          ),
-        ),
-      ),
-    );
-  }
-
-  void _saveAndGoHome() {
-    _saveMeasurement();
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(
-        content: Text('✅ Medición guardada en tu historial'),
-        backgroundColor: Colors.green,
-        duration: Duration(seconds: 2),
-      ),
-    );
+  void _goToHome() {
     Navigator.pushAndRemoveUntil(
       context,
       MaterialPageRoute(
@@ -178,126 +102,82 @@ class _ResultScreenState extends State<ResultScreen> {
       ),
       (route) => false,
     );
-  }
-
-  void _goToHomeWithoutSaving() {
-    Navigator.pushAndRemoveUntil(
-      context,
-      MaterialPageRoute(
-        builder: (context) => HomeScreen(
-          username: widget.username,
-          ageRange: widget.ageRange,
-          gender: widget.gender,
-          conditions: widget.conditions,
-          symptoms: widget.symptoms,
-          medications: widget.medications,
-        ),
-      ),
-      (route) => false,
-    );
-  }
-
-  String _getStatusText() {
-    if (widget.heartRate < 60) return 'Bradicardia (Ritmo lento)';
-    if (widget.heartRate > 100) return 'Taquicardia (Ritmo rápido)';
-    return 'Normal (Ritmo saludable)';
-  }
-
-  Color _getStatusColor() {
-    if (widget.heartRate < 60) return Colors.orange;
-    if (widget.heartRate > 100) return Colors.red;
-    return Colors.green;
   }
 
   @override
   Widget build(BuildContext context) {
-    final screenWidth = MediaQuery.of(context).size.width;
-    final isSmallScreen = screenWidth < 600;
+
+    final Color statusColor = widget.heartRate < 60 ? Colors.orange : (widget.heartRate > 100 ? Colors.red : Colors.green);
+    final String statusText = widget.heartRate < 60 ? 'Bradicardia' : (widget.heartRate > 100 ? 'Taquicardia' : 'Normal');
 
     return Scaffold(
       backgroundColor: Colors.white,
       appBar: AppBar(
         title: const Text('Resultado', style: TextStyle(color: Colors.white)),
         backgroundColor: Colors.red,
-        elevation: 0,
         centerTitle: true,
         automaticallyImplyLeading: false,
       ),
       body: SafeArea(
         child: SingleChildScrollView(
-          padding: EdgeInsets.all(isSmallScreen ? 20 : 30),
+          padding: const EdgeInsets.all(20),
           child: Column(
             children: [
-              const SizedBox(height: 20),
-              
               Container(
                 padding: const EdgeInsets.all(24),
-                decoration: BoxDecoration(
-                  color: _getStatusColor().withValues(alpha: 0.1),
-                  shape: BoxShape.circle,
-                ),
-                child: Icon(
-                  Icons.favorite,
-                  size: isSmallScreen ? 70 : 90,
-                  color: _getStatusColor(),
-                ),
+                decoration: BoxDecoration(color: statusColor.withValues(alpha: 0.1), shape: BoxShape.circle),
+                child: Icon(Icons.favorite, size: 70, color: statusColor),
               ),
               const SizedBox(height: 24),
-              
-              Text(
-                '${widget.heartRate}',
-                style: TextStyle(
-                  fontSize: isSmallScreen ? 56 : 72,
-                  fontWeight: FontWeight.bold,
-                  color: Colors.red,
-                ),
-              ),
-              const Text(
-                'latidos por minuto',
-                style: TextStyle(fontSize: 16, color: Colors.black54),
-              ),
+              Text('${widget.heartRate}', style: const TextStyle(fontSize: 56, fontWeight: FontWeight.bold, color: Colors.red)),
+              const Text('latidos por minuto', style: TextStyle(fontSize: 16, color: Colors.black54)),
               const SizedBox(height: 16),
-              
               Container(
                 padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 10),
-                decoration: BoxDecoration(
-                  color: _getStatusColor().withValues(alpha: 0.1),
-                  borderRadius: BorderRadius.circular(30),
-                ),
-                child: Text(
-                  _getStatusText(),
-                  style: TextStyle(
-                    fontSize: 16,
-                    fontWeight: FontWeight.bold,
-                    color: _getStatusColor(),
-                  ),
-                ),
+                decoration: BoxDecoration(color: statusColor.withValues(alpha: 0.1), borderRadius: BorderRadius.circular(30)),
+                child: Text(statusText, style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: statusColor)),
               ),
               const SizedBox(height: 24),
-              
-              // Botón: Ver correlación de factores (NUEVO)
               SizedBox(
                 width: double.infinity,
                 child: OutlinedButton.icon(
-                  onPressed: _goToCorrelation,
+                  onPressed: () {
+                    showModalBottomSheet(
+                      context: context,
+                      isScrollControlled: true,
+                      shape: const RoundedRectangleBorder(borderRadius: BorderRadius.vertical(top: Radius.circular(20))),
+                      builder: (context) => DraggableScrollableSheet(
+                        initialChildSize: 0.6,
+                        builder: (context, scrollController) => Container(
+                          padding: const EdgeInsets.all(20),
+                          child: Column(
+                            children: [
+                              const Center(child: SizedBox(width: 40, height: 4, child: DecoratedBox(decoration: BoxDecoration(color: Colors.grey, borderRadius: BorderRadius.all(Radius.circular(2)))))),
+                              const Text('🔬 Correlación de factores', style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold, color: Colors.red)),
+                              const SizedBox(height: 16),
+                              Expanded(
+                                child: SingleChildScrollView(
+                                  controller: scrollController,
+                                  child: Text(_correlationAnalysis, style: const TextStyle(fontSize: 14)),
+                                ),
+                              ),
+                              ElevatedButton(onPressed: () => Navigator.pop(context), child: const Text('Cerrar')),
+                            ],
+                          ),
+                        ),
+                      ),
+                    );
+                  },
                   icon: const Icon(Icons.analytics),
-                  label: const Text(
-                    'Ver correlación de factores de riesgo',
-                    style: TextStyle(fontSize: 14),
-                  ),
+                  label: const Text('Factores de riesgo y su correlación'),
                   style: OutlinedButton.styleFrom(
                     foregroundColor: Colors.blue,
                     side: BorderSide(color: Colors.blue.shade300),
-                    padding: const EdgeInsets.symmetric(vertical: 12),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(30),
-                    ),
+                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(30)),
                   ),
                 ),
               ),
               const SizedBox(height: 12),
-              
-              // Botón: Ver recomendación completa
               SizedBox(
                 width: double.infinity,
                 child: ElevatedButton(
@@ -320,23 +200,15 @@ class _ResultScreenState extends State<ResultScreen> {
                   style: ElevatedButton.styleFrom(
                     backgroundColor: Colors.red,
                     foregroundColor: Colors.white,
-                    padding: const EdgeInsets.symmetric(vertical: 16),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(30),
-                    ),
+                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(30)),
                   ),
-                  child: const Text(
-                    'Ver recomendación completa',
-                    style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
-                  ),
+                  child: const Text('Recomendación personalizada', style: TextStyle(fontSize: 16)),
                 ),
               ),
               const SizedBox(height: 12),
-              
-              // Botón: Comparar con tu grupo de edad
               SizedBox(
                 width: double.infinity,
-                child: OutlinedButton.icon(
+                child: OutlinedButton(
                   onPressed: () {
                     Navigator.push(
                       context,
@@ -350,56 +222,46 @@ class _ResultScreenState extends State<ResultScreen> {
                       ),
                     );
                   },
-                  icon: const Icon(Icons.people_outline),
-                  label: const Text(
-                    'Comparar con tu grupo de edad',
-                    style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
-                  ),
                   style: OutlinedButton.styleFrom(
                     foregroundColor: Colors.red,
-                    side: BorderSide(color: Colors.red.shade300, width: 1.5),
-                    padding: const EdgeInsets.symmetric(vertical: 16),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(30),
-                    ),
+                    side: BorderSide(color: Colors.red.shade300),
+                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(30)),
                   ),
+                  child: const Text('Comparar con tu grupo etario', style: TextStyle(fontSize: 16)),
                 ),
               ),
               const SizedBox(height: 16),
-              
-              // Botón: Guardar y salir
-              SizedBox(
-                width: double.infinity,
-                child: ElevatedButton.icon(
-                  onPressed: _saveAndGoHome,
-                  icon: const Icon(Icons.save),
-                  label: const Text(
-                    'Guardar y salir',
-                    style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
-                  ),
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: Colors.green,
-                    foregroundColor: Colors.white,
-                    padding: const EdgeInsets.symmetric(vertical: 16),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(30),
+              Row(
+                children: [
+                  Expanded(
+                    child: ElevatedButton.icon(
+                      onPressed: () {
+                        _saveMeasurement();
+                        _goToHome();
+                      },
+                      icon: const Icon(Icons.save),
+                      label: const Text('Guardar'),
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: Colors.green,
+                        foregroundColor: Colors.white,
+                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(30)),
+                      ),
                     ),
                   ),
-                ),
-              ),
-              const SizedBox(height: 8),
-              
-              // Botón: Salir sin guardar
-              TextButton.icon(
-                onPressed: _goToHomeWithoutSaving,
-                icon: const Icon(Icons.exit_to_app, size: 18),
-                label: const Text(
-                  'Salir sin guardar',
-                  style: TextStyle(fontSize: 14),
-                ),
-                style: TextButton.styleFrom(
-                  foregroundColor: Colors.red.shade400,
-                ),
+                  const SizedBox(width: 12),
+                  Expanded(
+                    child: OutlinedButton.icon(
+                      onPressed: _goToHome,
+                      icon: const Icon(Icons.exit_to_app),
+                      label: const Text('Salir'),
+                      style: OutlinedButton.styleFrom(
+                        foregroundColor: Colors.red,
+                        side: BorderSide(color: Colors.red.shade300),
+                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(30)),
+                      ),
+                    ),
+                  ),
+                ],
               ),
             ],
           ),

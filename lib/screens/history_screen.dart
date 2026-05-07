@@ -1,5 +1,5 @@
 // lib/screens/history_screen.dart
-// PANTALLA DE HISTORIAL EN MEMORIA
+
 
 import 'package:flutter/material.dart';
 import '../services/memory_history_service.dart';
@@ -108,26 +108,26 @@ class _HistoryScreenState extends State<HistoryScreen> {
                   child: ListTile(
                     contentPadding: const EdgeInsets.all(16),
                     leading: CircleAvatar(
-                      backgroundColor: _getStatusColor(record.heartRate).withOpacity(0.2),
+                      backgroundColor: _getStatusColor(record.heartRate).withValues(alpha: 0.2),
                       child: Icon(Icons.favorite, color: _getStatusColor(record.heartRate)),
                     ),
-                    title: Text(
-                      '${record.heartRate} lpm - ${_getStatusText(record.heartRate)}',
-                      style: const TextStyle(fontWeight: FontWeight.bold),
-                    ),
+                    title: Text('${record.heartRate} lpm - ${_getStatusText(record.heartRate)}', style: const TextStyle(fontWeight: FontWeight.bold)),
+
+
+
                     subtitle: Text('${_formatDate(record.dateTime)} • ${_formatTime(record.dateTime)}'),
-                    trailing: IconButton(
-                      icon: const Icon(Icons.delete_outline, color: Colors.grey),
-                      onPressed: () => _deleteRecord(record.id),
-                    ),
-                    onTap: () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (_) => MeasurementDetailScreen(record: record),
-                        ),
-                      );
-                    },
+                    trailing: IconButton(icon: const Icon(Icons.delete_outline, color: Colors.grey), onPressed: () => _deleteRecord(record.id)),
+                    onTap: () => Navigator.push(context, MaterialPageRoute(builder: (_) => MeasurementDetailScreen(record: record))),
+
+
+
+
+
+
+
+
+
+
                   ),
                 );
               },

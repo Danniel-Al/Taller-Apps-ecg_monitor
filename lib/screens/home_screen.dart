@@ -1,16 +1,17 @@
 // lib/screens/home_screen.dart
-// CON CONDITIONS COMO LISTA
+
 
 import 'package:flutter/material.dart';
 import 'measurement_screen.dart';
 import 'profile_screen.dart';
 import 'history_screen.dart';
+import '../services/memory_history_service.dart';
 
 class HomeScreen extends StatefulWidget {
   final String username;
   final int ageRange;
   final int gender;
-  final List<int> conditions;  // AHORA ES LISTA
+  final List<int> conditions;
   final int symptoms;
   final int medications;
 
@@ -35,9 +36,9 @@ class _HomeScreenState extends State<HomeScreen> {
   @override
   void initState() {
     super.initState();
-    // Establecer usuario actual en el servicio de historial
+
     MemoryHistoryService.setCurrentUser(widget.username);
-    
+
     _screens = [
       MeasurementScreen(
         ageRange: widget.ageRange,
@@ -68,24 +69,23 @@ class _HomeScreenState extends State<HomeScreen> {
         onTap: _onItemTapped,
         selectedItemColor: Colors.red,
         unselectedItemColor: Colors.grey,
-        selectedFontSize: 12,
-        unselectedFontSize: 12,
+
+
         items: const [
-          BottomNavigationBarItem(
-            icon: Icon(Icons.favorite),
-            label: 'Medición',
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.history),
-            label: 'Historial',
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.person),
-            label: 'Perfil',
-          ),
+          BottomNavigationBarItem(icon: Icon(Icons.favorite), label: 'Medición'),
+          BottomNavigationBarItem(icon: Icon(Icons.history), label: 'Historial'),
+          BottomNavigationBarItem(icon: Icon(Icons.person), label: 'Perfil'),
+
+
+
+
+
+
+
+
+
         ],
       ),
     );
   }
 }
-
