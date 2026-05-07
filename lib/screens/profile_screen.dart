@@ -1,9 +1,10 @@
 // lib/screens/profile_screen.dart
-// PANTALLA DE PERFIL DEL USUARIO
+// PANTALLA DE PERFIL CON BOTÓN DE CERRAR SESIÓN
 
 import 'package:flutter/material.dart';
 import '../models/user_data.dart';
 import 'update_demographic_screen.dart';
+import 'login_screen.dart';
 
 class ProfileScreen extends StatefulWidget {
   final String username;
@@ -36,6 +37,33 @@ class _ProfileScreenState extends State<ProfileScreen> {
     });
   }
 
+  void _logout() {
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text('Cerrar sesión'),
+        content: const Text('¿Estás seguro de que deseas cerrar sesión? Los datos guardados se mantendrán.'),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: const Text('Cancelar'),
+          ),
+          TextButton(
+            onPressed: () {
+              Navigator.pop(context); // Cerrar diálogo
+              Navigator.pushAndRemoveUntil(
+                context,
+                MaterialPageRoute(builder: (_) => const LoginScreen()),
+                (route) => false,
+              );
+            },
+            child: const Text('Cerrar sesión', style: TextStyle(color: Colors.red)),
+          ),
+        ],
+      ),
+    );
+  }
+
   Future<void> _editDemographics() async {
     final updated = await Navigator.push(
       context,
@@ -63,36 +91,57 @@ class _ProfileScreenState extends State<ProfileScreen> {
         title: const Text('Mi Perfil', style: TextStyle(color: Colors.white)),
         backgroundColor: Colors.red,
         centerTitle: true,
+        elevation: 0,
       ),
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(20),
         child: Column(
           children: [
+            // Tarjeta de bienvenida
             Container(
               padding: const EdgeInsets.all(20),
               decoration: BoxDecoration(
-                gradient: LinearGradient(colors: [Colors.red.shade50, Colors.red.shade100]),
+                gradient: LinearGradient(
+                  colors: [Colors.red.shade50, Colors.red.shade100],
+                  begin: Alignment.topLeft,
+                  end: Alignment.bottomRight,
+                ),
                 borderRadius: BorderRadius.circular(20),
               ),
               child: Row(
                 children: [
                   Container(
                     padding: const EdgeInsets.all(12),
-                    decoration: const BoxDecoration(color: Colors.white, shape: BoxShape.circle),
+                    decoration: const BoxDecoration(
+                      color: Colors.white,
+                      shape: BoxShape.circle,
+                    ),
                     child: const Icon(Icons.person, color: Colors.red, size: 32),
                   ),
                   const SizedBox(width: 16),
                   Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Text('Hola, ${_userData.username}', style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold, color: Colors.red)),
-                      const Text('Aquí puedes ver y editar tus datos', style: TextStyle(fontSize: 12)),
+                      Text(
+                        'Hola, ${_userData.username}',
+                        style: const TextStyle(
+                          fontSize: 20,
+                          fontWeight: FontWeight.bold,
+                          color: Colors.red,
+                        ),
+                      ),
+                      const Text(
+                        'Aquí puedes ver y editar tus datos',
+                        style: TextStyle(fontSize: 12, color: Colors.black54),
+                      ),
                     ],
                   ),
                 ],
               ),
             ),
             const SizedBox(height: 24),
+
+            // Botón editar datos
             SizedBox(
               width: double.infinity,
               child: ElevatedButton.icon(
@@ -102,13 +151,47 @@ class _ProfileScreenState extends State<ProfileScreen> {
                 style: ElevatedButton.styleFrom(
                   backgroundColor: Colors.white,
                   foregroundColor: Colors.red,
-                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(30), side: BorderSide(color: Colors.red.shade300)),
+                  padding: const EdgeInsets.symmetric(vertical: 12),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(30),
+                    side: BorderSide(color: Colors.red.shade300),
+                  ),
+                ),
+              ),
+            ),
+            const SizedBox(height: 16),
+
+            // Botón cerrar sesión (NUEVO)
+            SizedBox(
+              width: double.infinity,
+              child: OutlinedButton.icon(
+                onPressed: _logout,
+                icon: const Icon(Icons.logout),
+                label: const Text('Cerrar sesión'),
+                style: OutlinedButton.styleFrom(
+                  foregroundColor: Colors.red,
+                  side: BorderSide(color: Colors.red.shade300),
+                  padding: const EdgeInsets.symmetric(vertical: 12),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(30),
+                  ),
                 ),
               ),
             ),
             const SizedBox(height: 24),
-            const Text('Tus datos actuales', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: Colors.red)),
+
+            // Título de datos guardados
+            const Text(
+              'Tus datos actuales',
+              style: TextStyle(
+                fontSize: 18,
+                fontWeight: FontWeight.bold,
+                color: Colors.red,
+              ),
+            ),
             const SizedBox(height: 16),
+
+            // Tarjetas de información
             _buildInfoCard('👤 Nombre de usuario', _userData.username),
             _buildInfoCard('🎂 Edad', _getAgeRangeText()),
             _buildInfoCard('👤 Sexo', _getGenderText()),
@@ -124,15 +207,22 @@ class _ProfileScreenState extends State<ProfileScreen> {
   Widget _buildInfoCard(String label, String value) {
     return Card(
       margin: const EdgeInsets.only(bottom: 12),
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
       child: Padding(
         padding: const EdgeInsets.all(16),
         child: Row(
           children: [
-            Expanded(child: Text(label, style: const TextStyle(color: Colors.black54))),
-            Text(value, style: const TextStyle(fontWeight: FontWeight.w500)),
+            Expanded(
+              child: Text(label, style: const TextStyle(color: Colors.black54)),
+            ),
+            Text(
+              value,
+              style: const TextStyle(fontWeight: FontWeight.w500),
+            ),
           ],
         ),
       ),
     );
   }
 }
+
