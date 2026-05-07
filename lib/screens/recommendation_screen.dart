@@ -264,4 +264,3 @@ class RecommendationScreen extends StatelessWidget {
     return Colors.grey;
   }
 }
-

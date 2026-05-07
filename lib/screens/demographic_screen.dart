@@ -1,4 +1,3 @@
-
 // lib/screens/demographic_screen.dart
 import 'package:flutter/material.dart';
 import '../utils/constants.dart';
