@@ -1,23 +1,13 @@
 // lib/screens/measurement_detail_screen.dart
-// DETALLE DE UNA MEDICIÓN GUARDADA
-
 import 'package:flutter/material.dart';
 import '../models/measurement_record.dart';
-import '../services/recommendation_service.dart';
 import '../services/comparison_service.dart';
 import 'recommendation_screen.dart';
 import 'comparison_screen.dart';
 
 class MeasurementDetailScreen extends StatelessWidget {
   final MeasurementRecord record;
-
   const MeasurementDetailScreen({super.key, required this.record});
-
-  String _getStatusText() {
-    if (record.heartRate < 60) return 'Bradicardia (Ritmo lento)';
-    if (record.heartRate > 100) return 'Taquicardia (Ritmo rápido)';
-    return 'Normal (Ritmo saludable)';
-  }
 
   Color _getStatusColor() {
     if (record.heartRate < 60) return Colors.orange;
@@ -25,17 +15,24 @@ class MeasurementDetailScreen extends StatelessWidget {
     return Colors.green;
   }
 
-  String _formatDate() => '${record.dateTime.day}/${record.dateTime.month}/${record.dateTime.year}';
-  String _formatTime() => '${record.dateTime.hour.toString().padLeft(2, '0')}:${record.dateTime.minute.toString().padLeft(2, '0')}';
+  String _cleanText(String text) {
+    return text.replaceAll('**', '').replaceAll('*', '');
+  }
 
   @override
   Widget build(BuildContext context) {
+    final String statusText = record.heartRate < 60
+        ? 'Bradicardia'
+        : (record.heartRate > 100 ? 'Taquicardia' : 'Normal');
+    
+    final String cleanRecommendation = _cleanText(record.recommendation);
+    final String cleanComparisonText = _cleanText(record.comparisonText);
+
     return Scaffold(
       backgroundColor: Colors.white,
       appBar: AppBar(
         title: const Text('Detalle', style: TextStyle(color: Colors.white)),
         backgroundColor: Colors.red,
-        elevation: 0,
         centerTitle: true,
       ),
       body: SingleChildScrollView(
@@ -53,11 +50,17 @@ class MeasurementDetailScreen extends StatelessWidget {
                 children: [
                   const Icon(Icons.calendar_today, color: Colors.red),
                   const SizedBox(width: 8),
-                  Text(_formatDate(), style: const TextStyle(fontSize: 16)),
+                  Text(
+                    '${record.dateTime.day}/${record.dateTime.month}/${record.dateTime.year}',
+                    style: const TextStyle(fontSize: 16),
+                  ),
                   const SizedBox(width: 16),
                   const Icon(Icons.access_time, color: Colors.red),
                   const SizedBox(width: 8),
-                  Text(_formatTime(), style: const TextStyle(fontSize: 16)),
+                  Text(
+                    '${record.dateTime.hour.toString().padLeft(2, '0')}:${record.dateTime.minute.toString().padLeft(2, '0')}',
+                    style: const TextStyle(fontSize: 16),
+                  ),
                 ],
               ),
             ),
@@ -65,25 +68,41 @@ class MeasurementDetailScreen extends StatelessWidget {
             Container(
               padding: const EdgeInsets.all(24),
               decoration: BoxDecoration(
-                color: _getStatusColor().withOpacity(0.1),
+                color: _getStatusColor().withValues(alpha: 0.1),
                 shape: BoxShape.circle,
               ),
-              child: Icon(Icons.favorite, size: 64, color: _getStatusColor()),
+              child: Icon(
+                Icons.favorite,
+                size: 64,
+                color: _getStatusColor(),
+              ),
             ),
-            const SizedBox(height: 16),
             Text(
               '${record.heartRate}',
-              style: const TextStyle(fontSize: 48, fontWeight: FontWeight.bold, color: Colors.red),
+              style: const TextStyle(
+                fontSize: 48,
+                fontWeight: FontWeight.bold,
+                color: Colors.red,
+              ),
             ),
-            const Text('latidos por minuto', style: TextStyle(fontSize: 14, color: Colors.black54)),
+            const Text(
+              'latidos por minuto',
+              style: TextStyle(fontSize: 14, color: Colors.black54),
+            ),
             const SizedBox(height: 8),
             Container(
-              padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 8),
+              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 6),
               decoration: BoxDecoration(
-                color: _getStatusColor().withOpacity(0.1),
+                color: _getStatusColor().withValues(alpha: 0.1),
                 borderRadius: BorderRadius.circular(20),
               ),
-              child: Text(_getStatusText(), style: TextStyle(fontSize: 14, color: _getStatusColor())),
+              child: Text(
+                statusText,
+                style: TextStyle(
+                  color: _getStatusColor(),
+                  fontWeight: FontWeight.w500,
+                ),
+              ),
             ),
             const SizedBox(height: 24),
             Row(
@@ -97,6 +116,11 @@ class MeasurementDetailScreen extends StatelessWidget {
                           builder: (_) => RecommendationScreen(
                             heartRate: record.heartRate,
                             recommendation: record.recommendation,
+                            ageRange: record.ageRange,
+                            gender: record.gender,
+                            conditions: record.conditions,
+                            symptoms: record.symptoms,
+                            medications: record.medications,
                           ),
                         ),
                       );
@@ -106,7 +130,9 @@ class MeasurementDetailScreen extends StatelessWidget {
                     style: ElevatedButton.styleFrom(
                       backgroundColor: Colors.red,
                       foregroundColor: Colors.white,
-                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(30)),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(30),
+                      ),
                     ),
                   ),
                 ),
@@ -114,15 +140,22 @@ class MeasurementDetailScreen extends StatelessWidget {
                 Expanded(
                   child: OutlinedButton.icon(
                     onPressed: () {
-                      final comparison = ComparisonService.compare(
+                      final comparison = ComparisonService.getDetailedComparison(
                         heartRate: record.heartRate,
                         ageRange: record.ageRange,
                         gender: record.gender,
+                        conditions: record.conditions,
+                        symptoms: record.symptoms,
                       );
                       Navigator.push(
                         context,
                         MaterialPageRoute(
-                          builder: (_) => ComparisonScreen(comparison: comparison),
+                          builder: (_) => ComparisonScreen(
+                            comparison: comparison,
+                            heartRate: record.heartRate,
+                            ageRange: record.ageRange,
+                            gender: record.gender,
+                          ),
                         ),
                       );
                     },
@@ -131,13 +164,15 @@ class MeasurementDetailScreen extends StatelessWidget {
                     style: OutlinedButton.styleFrom(
                       foregroundColor: Colors.red,
                       side: BorderSide(color: Colors.red.shade300),
-                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(30)),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(30),
+                      ),
                     ),
                   ),
                 ),
               ],
             ),
-            const SizedBox(height: 24),
+            const SizedBox(height: 16),
             Container(
               padding: const EdgeInsets.all(16),
               decoration: BoxDecoration(
@@ -147,13 +182,26 @@ class MeasurementDetailScreen extends StatelessWidget {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  const Text('📋 Resumen', style: TextStyle(fontWeight: FontWeight.bold)),
+                  const Text(
+                    '📋 Resumen',
+                    style: TextStyle(fontWeight: FontWeight.bold),
+                  ),
                   const Divider(),
-                  _buildInfoRow('Comparación', record.comparisonText),
                   const SizedBox(height: 8),
-                  const Text('Recomendación:', style: TextStyle(fontWeight: FontWeight.w500)),
+                  Text(
+                    cleanComparisonText,
+                    style: const TextStyle(fontSize: 13),
+                  ),
+                  const SizedBox(height: 12),
+                  const Text(
+                    'Recomendación:',
+                    style: TextStyle(fontWeight: FontWeight.w500),
+                  ),
                   const SizedBox(height: 4),
-                  Text(record.recommendation, style: const TextStyle(fontSize: 13)),
+                  Text(
+                    cleanRecommendation,
+                    style: const TextStyle(fontSize: 13),
+                  ),
                 ],
               ),
             ),
@@ -162,17 +210,6 @@ class MeasurementDetailScreen extends StatelessWidget {
       ),
     );
   }
-
-  Widget _buildInfoRow(String label, String value) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 4),
-      child: Row(
-        children: [
-          SizedBox(width: 100, child: Text(label, style: const TextStyle(color: Colors.black54))),
-          Expanded(child: Text(value, style: const TextStyle(fontWeight: FontWeight.w500))),
-        ],
-      ),
-    );
-  }
 }
+
 
