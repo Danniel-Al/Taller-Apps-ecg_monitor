@@ -1,6 +1,5 @@
-// lib/screens/demographic_screen.dart
-// PANTALLA DE DATOS DEMOGRÁFICOS - VERSIÓN MEJORADA
 
+// lib/screens/demographic_screen.dart
 import 'package:flutter/material.dart';
 import '../utils/constants.dart';
 import 'home_screen.dart';
@@ -16,7 +15,7 @@ class DemographicScreen extends StatefulWidget {
 class _DemographicScreenState extends State<DemographicScreen> {
   int _selectedAgeRange = 0;
   int _selectedGender = 0;
-  int _selectedConditions = 0;
+  List<bool> _selectedConditions = List.filled(conditionsList.length, false);
   int _selectedSymptoms = 0;
   int _selectedMedications = 0;
   bool _isLoading = false;
@@ -26,9 +25,7 @@ class _DemographicScreenState extends State<DemographicScreen> {
 
   void _nextStep() {
     if (_currentStep < 3) {
-      setState(() {
-        _currentStep++;
-      });
+      setState(() => _currentStep++);
     } else {
       _saveAndContinue();
     }
@@ -36,15 +33,21 @@ class _DemographicScreenState extends State<DemographicScreen> {
 
   void _previousStep() {
     if (_currentStep > 0) {
-      setState(() {
-        _currentStep--;
-      });
+      setState(() => _currentStep--);
     }
   }
 
   void _saveAndContinue() async {
     setState(() => _isLoading = true);
     await Future.delayed(const Duration(milliseconds: 500));
+    
+    List<int> selectedConditionsIndexes = [];
+    for (int i = 0; i < _selectedConditions.length; i++) {
+      if (_selectedConditions[i]) {
+        selectedConditionsIndexes.add(i);
+      }
+    }
+    
     if (mounted) {
       setState(() => _isLoading = false);
       Navigator.pushReplacement(
@@ -54,7 +57,7 @@ class _DemographicScreenState extends State<DemographicScreen> {
             username: widget.username,
             ageRange: _selectedAgeRange,
             gender: _selectedGender,
-            conditions: _selectedConditions,
+            conditions: selectedConditionsIndexes,
             symptoms: _selectedSymptoms,
             medications: _selectedMedications,
           ),
@@ -68,49 +71,19 @@ class _DemographicScreenState extends State<DemographicScreen> {
       case 0:
         return Column(
           children: [
-            _buildSelector(
-              label: 'Edad',
-              icon: '🎂',
-              value: _selectedAgeRange,
-              items: ageRanges,
-              onChanged: (val) => setState(() => _selectedAgeRange = val),
-            ),
+            _buildSelector('Edad', '🎂', _selectedAgeRange, ageRanges, (val) => setState(() => _selectedAgeRange = val)),
             const SizedBox(height: 16),
-            _buildSelector(
-              label: 'Sexo',
-              icon: '👤',
-              value: _selectedGender,
-              items: genders,
-              onChanged: (val) => setState(() => _selectedGender = val),
-            ),
+            _buildSelector('Sexo', '👤', _selectedGender, genders, (val) => setState(() => _selectedGender = val)),
           ],
         );
       case 1:
-        return _buildSelector(
-          label: 'Antecedentes cardíacos',
-          icon: '❤️',
-          value: _selectedConditions,
-          items: conditionsList,
-          onChanged: (val) => setState(() => _selectedConditions = val),
-        );
+        return _buildConditionsCheckbox();
       case 2:
-        return _buildSelector(
-          label: 'Síntomas actuales',
-          icon: '🤒',
-          value: _selectedSymptoms,
-          items: symptomsList,
-          onChanged: (val) => setState(() => _selectedSymptoms = val),
-        );
+        return _buildSelector('Síntomas actuales', '🤒', _selectedSymptoms, symptomsList, (val) => setState(() => _selectedSymptoms = val));
       case 3:
         return Column(
           children: [
-            _buildSelector(
-              label: 'Medicamentos',
-              icon: '💊',
-              value: _selectedMedications,
-              items: medicationsList,
-              onChanged: (val) => setState(() => _selectedMedications = val),
-            ),
+            _buildSelector('Medicamentos', '💊', _selectedMedications, medicationsList, (val) => setState(() => _selectedMedications = val)),
             const SizedBox(height: 24),
             Container(
               padding: const EdgeInsets.all(16),
@@ -139,13 +112,7 @@ class _DemographicScreenState extends State<DemographicScreen> {
     }
   }
 
-  Widget _buildSelector({
-    required String label,
-    required String icon,
-    required int value,
-    required List<String> items,
-    required Function(int) onChanged,
-  }) {
+  Widget _buildConditionsCheckbox() {
     return Card(
       elevation: 4,
       margin: const EdgeInsets.only(bottom: 16),
@@ -163,42 +130,113 @@ class _DemographicScreenState extends State<DemographicScreen> {
                     color: Colors.red.shade50,
                     borderRadius: BorderRadius.circular(12),
                   ),
-                  child: Text(icon, style: const TextStyle(fontSize: 24)),
+                  child: const Text('❤️', style: TextStyle(fontSize: 24)),
                 ),
                 const SizedBox(width: 16),
-                Expanded(
+                const Expanded(
                   child: Text(
-                    label,
-                    style: const TextStyle(
-                      fontSize: 16,
-                      fontWeight: FontWeight.w600,
-                      color: Colors.red,
-                    ),
+                    'Antecedentes cardíacos y factores de riesgo',
+                    style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600, color: Colors.red),
                   ),
                 ),
               ],
             ),
             const SizedBox(height: 20),
-            DropdownButtonFormField<int>(
-              value: value,
-              decoration: InputDecoration(
-                border: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(12),
-                ),
-                contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
-                filled: true,
-                fillColor: Colors.grey.shade50,
+            const Text(
+              'Selecciona TODOS los que apliquen:',
+              style: TextStyle(fontSize: 14, fontWeight: FontWeight.w500),
+            ),
+            const SizedBox(height: 12),
+            ...List.generate(conditionsList.length, (index) {
+              return CheckboxListTile(
+                value: _selectedConditions[index],
+                onChanged: (bool? value) => setState(() => _selectedConditions[index] = value ?? false),
+                title: Text(conditionsList[index]),
+                activeColor: Colors.red,
+                dense: true,
+                contentPadding: EdgeInsets.zero,
+                controlAffinity: ListTileControlAffinity.leading,
+              );
+            }),
+            const SizedBox(height: 16),
+            Container(
+              padding: const EdgeInsets.all(12),
+              decoration: BoxDecoration(
+                color: Colors.blue.shade50,
+                borderRadius: BorderRadius.circular(12),
               ),
-              items: items.asMap().entries.map((entry) {
-                return DropdownMenuItem<int>(
-                  value: entry.key,
-                  child: Text(
-                    entry.value,
-                    style: const TextStyle(fontSize: 14),
+              child: const Row(
+                children: [
+                  Icon(Icons.info_outline, size: 20, color: Colors.blue),
+                  SizedBox(width: 8),
+                  Expanded(
+                    child: Text(
+                      'Puedes seleccionar múltiples opciones. Esto ayuda a evaluar mejor tu riesgo cardiovascular.',
+                      style: TextStyle(fontSize: 12),
+                    ),
                   ),
-                );
-              }).toList(),
-              onChanged: (val) => onChanged(val!),
+                ],
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildSelector(String label, String icon, int value, List<String> items, Function(int) onChanged) {
+    return Card(
+      elevation: 2,
+      margin: const EdgeInsets.only(bottom: 16),
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+      child: Padding(
+        padding: const EdgeInsets.all(16),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Row(
+              children: [
+                Container(
+                  padding: const EdgeInsets.all(8),
+                  decoration: BoxDecoration(
+                    color: Colors.red.shade50,
+                    borderRadius: BorderRadius.circular(10),
+                  ),
+                  child: Text(icon, style: const TextStyle(fontSize: 20)),
+                ),
+                const SizedBox(width: 12),
+                Expanded(
+                  child: Text(
+                    label,
+                    style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w600, color: Colors.red),
+                  ),
+                ),
+              ],
+            ),
+            const SizedBox(height: 12),
+            Container(
+              constraints: const BoxConstraints(maxWidth: 400),
+              child: DropdownButtonFormField<int>(
+                initialValue: value,
+                isExpanded: true,
+                decoration: InputDecoration(
+                  border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
+                  contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 12),
+                  filled: true,
+                  fillColor: Colors.grey.shade50,
+                ),
+                items: items.asMap().entries.map((entry) {
+                  return DropdownMenuItem<int>(
+                    value: entry.key,
+                    child: Text(
+                      entry.value,
+                      style: const TextStyle(fontSize: 13),
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                  );
+                }).toList(),
+                onChanged: (val) => onChanged(val!),
+              ),
             ),
           ],
         ),
@@ -208,6 +246,9 @@ class _DemographicScreenState extends State<DemographicScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final screenWidth = MediaQuery.of(context).size.width;
+    final isSmallScreen = screenWidth < 600;
+
     return Scaffold(
       backgroundColor: Colors.white,
       appBar: AppBar(
@@ -221,7 +262,6 @@ class _DemographicScreenState extends State<DemographicScreen> {
           ? const Center(child: CircularProgressIndicator())
           : Column(
               children: [
-                // Header con progreso
                 Container(
                   padding: const EdgeInsets.all(20),
                   decoration: BoxDecoration(
@@ -266,7 +306,6 @@ class _DemographicScreenState extends State<DemographicScreen> {
                         ],
                       ),
                       const SizedBox(height: 20),
-                      // Indicador de pasos
                       Row(
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: List.generate(_steps.length, (index) {
@@ -303,7 +342,7 @@ class _DemographicScreenState extends State<DemographicScreen> {
                                   Text(
                                     _steps[index],
                                     style: TextStyle(
-                                      fontSize: 10,
+                                      fontSize: isSmallScreen ? 8 : 10,
                                       color: index <= _currentStep
                                           ? Colors.red
                                           : Colors.grey,
@@ -318,14 +357,12 @@ class _DemographicScreenState extends State<DemographicScreen> {
                     ],
                   ),
                 ),
-                // Contenido del paso actual
                 Expanded(
                   child: SingleChildScrollView(
                     padding: const EdgeInsets.all(20),
                     child: _buildStepContent(),
                   ),
                 ),
-                // Botones de navegación
                 Padding(
                   padding: const EdgeInsets.all(20),
                   child: Row(
