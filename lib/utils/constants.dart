@@ -15,13 +15,16 @@ const List<String> genders = [
   'Prefiero no decirlo',
 ];
 
+// Antecedentes cardíacos - AHORA CON TABAQUISMO
 const List<String> conditionsList = [
-  'Ninguno',
   'Hipertensión arterial',
+  'Diabetes mellitus',
+  'Colesterol alto (dislipidemia)',
   'Insuficiencia cardíaca',
   'Infarto previo',
   'Arritmias diagnosticadas',
   'Cardiopatía congénita',
+  'Tabaquismo (fumador activo o exfumador)',
 ];
 
 const List<String> symptomsList = [
@@ -30,6 +33,7 @@ const List<String> symptomsList = [
   'Dolor en el pecho',
   'Mareos o desmayos',
   'Falta de aire',
+  'Fatiga o cansancio extremo',
 ];
 
 const List<String> medicationsList = [

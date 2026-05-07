@@ -1,5 +1,5 @@
 // lib/screens/demographic_screen.dart
-// PANTALLA DE DATOS DEMOGRÁFICOS - VERSIÓN MEJORADA
+// CON CHECKBOX PARA MÚLTIPLES ANTECEDENTES
 
 import 'package:flutter/material.dart';
 import '../utils/constants.dart';
@@ -16,7 +16,7 @@ class DemographicScreen extends StatefulWidget {
 class _DemographicScreenState extends State<DemographicScreen> {
   int _selectedAgeRange = 0;
   int _selectedGender = 0;
-  int _selectedConditions = 0;
+  List<bool> _selectedConditions = List.filled(conditionsList.length, false);
   int _selectedSymptoms = 0;
   int _selectedMedications = 0;
   bool _isLoading = false;
@@ -26,9 +26,7 @@ class _DemographicScreenState extends State<DemographicScreen> {
 
   void _nextStep() {
     if (_currentStep < 3) {
-      setState(() {
-        _currentStep++;
-      });
+      setState(() => _currentStep++);
     } else {
       _saveAndContinue();
     }
@@ -36,15 +34,22 @@ class _DemographicScreenState extends State<DemographicScreen> {
 
   void _previousStep() {
     if (_currentStep > 0) {
-      setState(() {
-        _currentStep--;
-      });
+      setState(() => _currentStep--);
     }
   }
 
   void _saveAndContinue() async {
     setState(() => _isLoading = true);
     await Future.delayed(const Duration(milliseconds: 500));
+    
+    // Obtener índices de condiciones seleccionadas
+    List<int> selectedConditionsIndexes = [];
+    for (int i = 0; i < _selectedConditions.length; i++) {
+      if (_selectedConditions[i]) {
+        selectedConditionsIndexes.add(i);
+      }
+    }
+    
     if (mounted) {
       setState(() => _isLoading = false);
       Navigator.pushReplacement(
@@ -54,7 +59,7 @@ class _DemographicScreenState extends State<DemographicScreen> {
             username: widget.username,
             ageRange: _selectedAgeRange,
             gender: _selectedGender,
-            conditions: _selectedConditions,
+            conditions: selectedConditionsIndexes,
             symptoms: _selectedSymptoms,
             medications: _selectedMedications,
           ),
@@ -86,13 +91,7 @@ class _DemographicScreenState extends State<DemographicScreen> {
           ],
         );
       case 1:
-        return _buildSelector(
-          label: 'Antecedentes cardíacos',
-          icon: '❤️',
-          value: _selectedConditions,
-          items: conditionsList,
-          onChanged: (val) => setState(() => _selectedConditions = val),
-        );
+        return _buildConditionsCheckbox();
       case 2:
         return _buildSelector(
           label: 'Síntomas actuales',
@@ -139,6 +138,86 @@ class _DemographicScreenState extends State<DemographicScreen> {
     }
   }
 
+  Widget _buildConditionsCheckbox() {
+    return Card(
+      elevation: 4,
+      margin: const EdgeInsets.only(bottom: 16),
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+      child: Padding(
+        padding: const EdgeInsets.all(20),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Row(
+              children: [
+                Container(
+                  padding: const EdgeInsets.all(10),
+                  decoration: BoxDecoration(
+                    color: Colors.red.shade50,
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                  child: const Text('❤️', style: TextStyle(fontSize: 24)),
+                ),
+                const SizedBox(width: 16),
+                const Expanded(
+                  child: Text(
+                    'Antecedentes cardíacos y factores de riesgo',
+                    style: TextStyle(
+                      fontSize: 16,
+                      fontWeight: FontWeight.w600,
+                      color: Colors.red,
+                    ),
+                  ),
+                ),
+              ],
+            ),
+            const SizedBox(height: 20),
+            const Text(
+              'Selecciona TODOS los que apliquen:',
+              style: TextStyle(fontSize: 14, fontWeight: FontWeight.w500),
+            ),
+            const SizedBox(height: 12),
+            ...List.generate(conditionsList.length, (index) {
+              return CheckboxListTile(
+                value: _selectedConditions[index],
+                onChanged: (bool? value) {
+                  setState(() {
+                    _selectedConditions[index] = value ?? false;
+                  });
+                },
+                title: Text(conditionsList[index]),
+                activeColor: Colors.red,
+                dense: true,
+                contentPadding: EdgeInsets.zero,
+                controlAffinity: ListTileControlAffinity.leading,
+              );
+            }),
+            const SizedBox(height: 16),
+            Container(
+              padding: const EdgeInsets.all(12),
+              decoration: BoxDecoration(
+                color: Colors.blue.shade50,
+                borderRadius: BorderRadius.circular(12),
+              ),
+              child: const Row(
+                children: [
+                  Icon(Icons.info_outline, size: 20, color: Colors.blue),
+                  SizedBox(width: 8),
+                  Expanded(
+                    child: Text(
+                      'Puedes seleccionar múltiples opciones. Esto ayuda a evaluar mejor tu riesgo cardiovascular.',
+                      style: TextStyle(fontSize: 12),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
   Widget _buildSelector({
     required String label,
     required String icon,
@@ -182,9 +261,7 @@ class _DemographicScreenState extends State<DemographicScreen> {
             DropdownButtonFormField<int>(
               value: value,
               decoration: InputDecoration(
-                border: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(12),
-                ),
+                border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
                 contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
                 filled: true,
                 fillColor: Colors.grey.shade50,
@@ -208,6 +285,9 @@ class _DemographicScreenState extends State<DemographicScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final screenWidth = MediaQuery.of(context).size.width;
+    final isSmallScreen = screenWidth < 600;
+
     return Scaffold(
       backgroundColor: Colors.white,
       appBar: AppBar(
@@ -221,7 +301,6 @@ class _DemographicScreenState extends State<DemographicScreen> {
           ? const Center(child: CircularProgressIndicator())
           : Column(
               children: [
-                // Header con progreso
                 Container(
                   padding: const EdgeInsets.all(20),
                   decoration: BoxDecoration(
@@ -266,7 +345,6 @@ class _DemographicScreenState extends State<DemographicScreen> {
                         ],
                       ),
                       const SizedBox(height: 20),
-                      // Indicador de pasos
                       Row(
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: List.generate(_steps.length, (index) {
@@ -303,7 +381,7 @@ class _DemographicScreenState extends State<DemographicScreen> {
                                   Text(
                                     _steps[index],
                                     style: TextStyle(
-                                      fontSize: 10,
+                                      fontSize: isSmallScreen ? 8 : 10,
                                       color: index <= _currentStep
                                           ? Colors.red
                                           : Colors.grey,
@@ -318,14 +396,12 @@ class _DemographicScreenState extends State<DemographicScreen> {
                     ],
                   ),
                 ),
-                // Contenido del paso actual
                 Expanded(
                   child: SingleChildScrollView(
                     padding: const EdgeInsets.all(20),
                     child: _buildStepContent(),
                   ),
                 ),
-                // Botones de navegación
                 Padding(
                   padding: const EdgeInsets.all(20),
                   child: Row(

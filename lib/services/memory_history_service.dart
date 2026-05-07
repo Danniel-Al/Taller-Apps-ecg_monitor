@@ -1,37 +1,56 @@
 // lib/services/memory_history_service.dart
-// SERVICIO DE HISTORIAL EN MEMORIA (SE BORRA AL CERRAR LA APP)
+// HISTORIAL SEPARADO POR USUARIO
 
 import '../models/measurement_record.dart';
 
 class MemoryHistoryService {
-  // Lista estática que se mantiene mientras la app está abierta
-  static final List<MeasurementRecord> _records = [];
+  // Mapa: username -> lista de mediciones
+  static final Map<String, List<MeasurementRecord>> _userRecords = {};
 
-  // Guardar una nueva medición
+  // Usuario actualmente logueado
+  static String? _currentUser;
+
+  // Establecer usuario actual
+  static void setCurrentUser(String username) {
+    _currentUser = username;
+    if (!_userRecords.containsKey(username)) {
+      _userRecords[username] = [];
+    }
+  }
+
+  // Limpiar datos del usuario actual (al cerrar sesión)
+  static void clearCurrentUser() {
+    _currentUser = null;
+  }
+
+  // Guardar una nueva medición para el usuario actual
   static void saveMeasurement(MeasurementRecord record) {
-    _records.add(record);
-    // Ordenar por fecha descendente (más reciente primero)
-    _records.sort((a, b) => b.dateTime.compareTo(a.dateTime));
+    if (_currentUser == null) return;
+    if (!_userRecords.containsKey(_currentUser)) {
+      _userRecords[_currentUser!] = [];
+    }
+    _userRecords[_currentUser!]!.add(record);
+    _userRecords[_currentUser!]!.sort((a, b) => b.dateTime.compareTo(a.dateTime));
   }
 
-  // Obtener todas las mediciones
+  // Obtener todas las mediciones del usuario actual
   static List<MeasurementRecord> getMeasurements() {
-    return List.from(_records);
+    if (_currentUser == null) return [];
+    return List.from(_userRecords[_currentUser] ?? []);
   }
 
-  // Eliminar una medición específica
+  // Eliminar una medición específica del usuario actual
   static void deleteMeasurement(String id) {
-    _records.removeWhere((record) => record.id == id);
+    if (_currentUser == null) return;
+    final records = _userRecords[_currentUser];
+    if (records != null) {
+      records.removeWhere((record) => record.id == id);
+    }
   }
 
-  // Eliminar todo el historial
+  // Eliminar todo el historial del usuario actual
   static void clearHistory() {
-    _records.clear();
-  }
-
-  // Obtener cantidad de mediciones
-  static int getCount() {
-    return _records.length;
+    if (_currentUser == null) return;
+    _userRecords[_currentUser] = [];
   }
 }
-

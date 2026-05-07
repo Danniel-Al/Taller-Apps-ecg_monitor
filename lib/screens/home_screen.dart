@@ -1,5 +1,5 @@
 // lib/screens/home_screen.dart
-// PANTALLA PRINCIPAL CON 3 PESTAÑAS (INCLUYE HISTORIAL)
+// CON CONDITIONS COMO LISTA
 
 import 'package:flutter/material.dart';
 import 'measurement_screen.dart';
@@ -10,7 +10,7 @@ class HomeScreen extends StatefulWidget {
   final String username;
   final int ageRange;
   final int gender;
-  final int conditions;
+  final List<int> conditions;  // AHORA ES LISTA
   final int symptoms;
   final int medications;
 
@@ -35,6 +35,9 @@ class _HomeScreenState extends State<HomeScreen> {
   @override
   void initState() {
     super.initState();
+    // Establecer usuario actual en el servicio de historial
+    MemoryHistoryService.setCurrentUser(widget.username);
+    
     _screens = [
       MeasurementScreen(
         ageRange: widget.ageRange,
@@ -42,6 +45,7 @@ class _HomeScreenState extends State<HomeScreen> {
         conditions: widget.conditions,
         symptoms: widget.symptoms,
         medications: widget.medications,
+        username: widget.username,
       ),
       const HistoryScreen(),
       ProfileScreen(username: widget.username),
@@ -84,3 +88,4 @@ class _HomeScreenState extends State<HomeScreen> {
     );
   }
 }
+
