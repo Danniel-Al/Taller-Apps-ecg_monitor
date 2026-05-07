@@ -1,5 +1,5 @@
 // lib/screens/home_screen.dart
-// PANTALLA PRINCIPAL CON 3 PESTAÑAS
+// PANTALLA PRINCIPAL CON 3 PESTAÑAS (INCLUYE HISTORIAL)
 
 import 'package:flutter/material.dart';
 import 'measurement_screen.dart';
@@ -48,7 +48,11 @@ class _HomeScreenState extends State<HomeScreen> {
     ];
   }
 
-  void _onItemTapped(int index) => setState(() => _selectedIndex = index);
+  void _onItemTapped(int index) {
+    setState(() {
+      _selectedIndex = index;
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -69,3 +73,4 @@ class _HomeScreenState extends State<HomeScreen> {
     );
   }
 }
+

@@ -33,7 +33,7 @@ class MeasurementDetailScreen extends StatelessWidget {
     return Scaffold(
       backgroundColor: Colors.white,
       appBar: AppBar(
-        title: const Text('Detalle de medición', style: TextStyle(color: Colors.white)),
+        title: const Text('Detalle', style: TextStyle(color: Colors.white)),
         backgroundColor: Colors.red,
         elevation: 0,
         centerTitle: true,
@@ -44,7 +44,10 @@ class MeasurementDetailScreen extends StatelessWidget {
           children: [
             Container(
               padding: const EdgeInsets.all(16),
-              decoration: BoxDecoration(color: Colors.red.shade50, borderRadius: BorderRadius.circular(16)),
+              decoration: BoxDecoration(
+                color: Colors.red.shade50,
+                borderRadius: BorderRadius.circular(16),
+              ),
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
@@ -61,16 +64,25 @@ class MeasurementDetailScreen extends StatelessWidget {
             const SizedBox(height: 24),
             Container(
               padding: const EdgeInsets.all(24),
-              decoration: BoxDecoration(color: _getStatusColor().withOpacity(0.1), shape: BoxShape.circle),
+              decoration: BoxDecoration(
+                color: _getStatusColor().withOpacity(0.1),
+                shape: BoxShape.circle,
+              ),
               child: Icon(Icons.favorite, size: 64, color: _getStatusColor()),
             ),
             const SizedBox(height: 16),
-            Text('${record.heartRate}', style: const TextStyle(fontSize: 48, fontWeight: FontWeight.bold, color: Colors.red)),
+            Text(
+              '${record.heartRate}',
+              style: const TextStyle(fontSize: 48, fontWeight: FontWeight.bold, color: Colors.red),
+            ),
             const Text('latidos por minuto', style: TextStyle(fontSize: 14, color: Colors.black54)),
             const SizedBox(height: 8),
             Container(
               padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 8),
-              decoration: BoxDecoration(color: _getStatusColor().withOpacity(0.1), borderRadius: BorderRadius.circular(20)),
+              decoration: BoxDecoration(
+                color: _getStatusColor().withOpacity(0.1),
+                borderRadius: BorderRadius.circular(20),
+              ),
               child: Text(_getStatusText(), style: TextStyle(fontSize: 14, color: _getStatusColor())),
             ),
             const SizedBox(height: 24),
@@ -94,7 +106,6 @@ class MeasurementDetailScreen extends StatelessWidget {
                     style: ElevatedButton.styleFrom(
                       backgroundColor: Colors.red,
                       foregroundColor: Colors.white,
-                      padding: const EdgeInsets.symmetric(vertical: 12),
                       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(30)),
                     ),
                   ),
@@ -120,7 +131,6 @@ class MeasurementDetailScreen extends StatelessWidget {
                     style: OutlinedButton.styleFrom(
                       foregroundColor: Colors.red,
                       side: BorderSide(color: Colors.red.shade300),
-                      padding: const EdgeInsets.symmetric(vertical: 12),
                       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(30)),
                     ),
                   ),
@@ -130,11 +140,14 @@ class MeasurementDetailScreen extends StatelessWidget {
             const SizedBox(height: 24),
             Container(
               padding: const EdgeInsets.all(16),
-              decoration: BoxDecoration(color: Colors.grey.shade50, borderRadius: BorderRadius.circular(16)),
+              decoration: BoxDecoration(
+                color: Colors.grey.shade50,
+                borderRadius: BorderRadius.circular(16),
+              ),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  const Text('📋 Resumen de la medición', style: TextStyle(fontWeight: FontWeight.bold)),
+                  const Text('📋 Resumen', style: TextStyle(fontWeight: FontWeight.bold)),
                   const Divider(),
                   _buildInfoRow('Comparación', record.comparisonText),
                   const SizedBox(height: 8),
@@ -162,3 +175,4 @@ class MeasurementDetailScreen extends StatelessWidget {
     );
   }
 }
+
