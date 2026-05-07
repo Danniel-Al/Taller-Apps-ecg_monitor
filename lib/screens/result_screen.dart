@@ -1,5 +1,5 @@
 // lib/screens/result_screen.dart
-// PANTALLA DE RESULTADOS CON GUARDADO EN MEMORIA
+// PANTALLA DE RESULTADOS CON GUARDADO CORREGIDO
 
 import 'package:flutter/material.dart';
 import '../services/recommendation_service.dart';
@@ -42,6 +42,9 @@ class ResultScreen extends StatelessWidget {
       comparisonText: '${comparison.status} - ${comparison.percentile}',
     );
     MemoryHistoryService.saveMeasurement(record);
+    
+    // Mostrar mensaje de confirmación
+    debugPrint('✅ Medición guardada: ${heartRate} lpm a las ${DateTime.now()}');
   }
 
   String _getStatusText() {
@@ -155,6 +158,16 @@ class ResultScreen extends StatelessWidget {
                     medications: medications,
                   );
                   _saveMeasurement(recommendation, comparison);
+                  
+                  // Mostrar snackbar de confirmación
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    const SnackBar(
+                      content: Text('✅ Medición guardada en historial'),
+                      backgroundColor: Colors.green,
+                      duration: Duration(seconds: 2),
+                    ),
+                  );
+                  
                   Navigator.push(
                     context,
                     MaterialPageRoute(
