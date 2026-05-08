@@ -7,3 +7,6 @@ Aplicación para la toma de datos de la actividad eléctrica del corazón
 - Historial de toma de datos
 - Recomendaciones
 - Comparación demográfica
+
+## Video de Funcionamiento App
+https://canva.link/0xnbxyct0nw0we9
