@@ -1,6 +1,5 @@
-// lib/screens/demographic_screen.dart
-// CON CHECKBOX PARA MÚLTIPLES ANTECEDENTES
 
+// lib/screens/demographic_screen.dart
 import 'package:flutter/material.dart';
 import '../utils/constants.dart';
 import 'home_screen.dart';
@@ -42,7 +41,6 @@ class _DemographicScreenState extends State<DemographicScreen> {
     setState(() => _isLoading = true);
     await Future.delayed(const Duration(milliseconds: 500));
     
-    // Obtener índices de condiciones seleccionadas
     List<int> selectedConditionsIndexes = [];
     for (int i = 0; i < _selectedConditions.length; i++) {
       if (_selectedConditions[i]) {
@@ -73,43 +71,19 @@ class _DemographicScreenState extends State<DemographicScreen> {
       case 0:
         return Column(
           children: [
-            _buildSelector(
-              label: 'Edad',
-              icon: '🎂',
-              value: _selectedAgeRange,
-              items: ageRanges,
-              onChanged: (val) => setState(() => _selectedAgeRange = val),
-            ),
+            _buildSelector('Edad', '🎂', _selectedAgeRange, ageRanges, (val) => setState(() => _selectedAgeRange = val)),
             const SizedBox(height: 16),
-            _buildSelector(
-              label: 'Sexo',
-              icon: '👤',
-              value: _selectedGender,
-              items: genders,
-              onChanged: (val) => setState(() => _selectedGender = val),
-            ),
+            _buildSelector('Sexo', '👤', _selectedGender, genders, (val) => setState(() => _selectedGender = val)),
           ],
         );
       case 1:
         return _buildConditionsCheckbox();
       case 2:
-        return _buildSelector(
-          label: 'Síntomas actuales',
-          icon: '🤒',
-          value: _selectedSymptoms,
-          items: symptomsList,
-          onChanged: (val) => setState(() => _selectedSymptoms = val),
-        );
+        return _buildSelector('Síntomas actuales', '🤒', _selectedSymptoms, symptomsList, (val) => setState(() => _selectedSymptoms = val));
       case 3:
         return Column(
           children: [
-            _buildSelector(
-              label: 'Medicamentos',
-              icon: '💊',
-              value: _selectedMedications,
-              items: medicationsList,
-              onChanged: (val) => setState(() => _selectedMedications = val),
-            ),
+            _buildSelector('Medicamentos', '💊', _selectedMedications, medicationsList, (val) => setState(() => _selectedMedications = val)),
             const SizedBox(height: 24),
             Container(
               padding: const EdgeInsets.all(16),
@@ -162,11 +136,7 @@ class _DemographicScreenState extends State<DemographicScreen> {
                 const Expanded(
                   child: Text(
                     'Antecedentes cardíacos y factores de riesgo',
-                    style: TextStyle(
-                      fontSize: 16,
-                      fontWeight: FontWeight.w600,
-                      color: Colors.red,
-                    ),
+                    style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600, color: Colors.red),
                   ),
                 ),
               ],
@@ -180,11 +150,7 @@ class _DemographicScreenState extends State<DemographicScreen> {
             ...List.generate(conditionsList.length, (index) {
               return CheckboxListTile(
                 value: _selectedConditions[index],
-                onChanged: (bool? value) {
-                  setState(() {
-                    _selectedConditions[index] = value ?? false;
-                  });
-                },
+                onChanged: (bool? value) => setState(() => _selectedConditions[index] = value ?? false),
                 title: Text(conditionsList[index]),
                 activeColor: Colors.red,
                 dense: true,
@@ -218,64 +184,59 @@ class _DemographicScreenState extends State<DemographicScreen> {
     );
   }
 
-  Widget _buildSelector({
-    required String label,
-    required String icon,
-    required int value,
-    required List<String> items,
-    required Function(int) onChanged,
-  }) {
+  Widget _buildSelector(String label, String icon, int value, List<String> items, Function(int) onChanged) {
     return Card(
-      elevation: 4,
+      elevation: 2,
       margin: const EdgeInsets.only(bottom: 16),
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
       child: Padding(
-        padding: const EdgeInsets.all(20),
+        padding: const EdgeInsets.all(16),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Row(
               children: [
                 Container(
-                  padding: const EdgeInsets.all(10),
+                  padding: const EdgeInsets.all(8),
                   decoration: BoxDecoration(
                     color: Colors.red.shade50,
-                    borderRadius: BorderRadius.circular(12),
+                    borderRadius: BorderRadius.circular(10),
                   ),
-                  child: Text(icon, style: const TextStyle(fontSize: 24)),
+                  child: Text(icon, style: const TextStyle(fontSize: 20)),
                 ),
-                const SizedBox(width: 16),
+                const SizedBox(width: 12),
                 Expanded(
                   child: Text(
                     label,
-                    style: const TextStyle(
-                      fontSize: 16,
-                      fontWeight: FontWeight.w600,
-                      color: Colors.red,
-                    ),
+                    style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w600, color: Colors.red),
                   ),
                 ),
               ],
             ),
-            const SizedBox(height: 20),
-            DropdownButtonFormField<int>(
-              value: value,
-              decoration: InputDecoration(
-                border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
-                contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
-                filled: true,
-                fillColor: Colors.grey.shade50,
+            const SizedBox(height: 12),
+            Container(
+              constraints: const BoxConstraints(maxWidth: 400),
+              child: DropdownButtonFormField<int>(
+                initialValue: value,
+                isExpanded: true,
+                decoration: InputDecoration(
+                  border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
+                  contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 12),
+                  filled: true,
+                  fillColor: Colors.grey.shade50,
+                ),
+                items: items.asMap().entries.map((entry) {
+                  return DropdownMenuItem<int>(
+                    value: entry.key,
+                    child: Text(
+                      entry.value,
+                      style: const TextStyle(fontSize: 13),
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                  );
+                }).toList(),
+                onChanged: (val) => onChanged(val!),
               ),
-              items: items.asMap().entries.map((entry) {
-                return DropdownMenuItem<int>(
-                  value: entry.key,
-                  child: Text(
-                    entry.value,
-                    style: const TextStyle(fontSize: 14),
-                  ),
-                );
-              }).toList(),
-              onChanged: (val) => onChanged(val!),
             ),
           ],
         ),
@@ -444,4 +405,3 @@ class _DemographicScreenState extends State<DemographicScreen> {
     );
   }
 }
-

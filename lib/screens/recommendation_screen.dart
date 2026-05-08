@@ -1,340 +1,210 @@
-// lib/screens/result_screen.dart
-// SOLO GUARDA CUANDO EL USUARIO PRESIONA "GUARDAR Y SALIR"
+// lib/screens/recommendation_screen.dart
+// VERSIÓN CON TARJETAS SEPARADAS POR SECCIÓN
 
 import 'package:flutter/material.dart';
-import '../services/recommendation_service.dart';
-import '../services/comparison_service.dart';
-import '../services/memory_history_service.dart';
-import '../models/measurement_record.dart';
-import 'recommendation_screen.dart';
-import 'comparison_screen.dart';
-import 'home_screen.dart';
 
-class ResultScreen extends StatefulWidget {
+class RecommendationScreen extends StatelessWidget {
   final int heartRate;
+  final String recommendation;
   final int ageRange;
   final int gender;
-  final int conditions;
+  final List<int> conditions;
   final int symptoms;
   final int medications;
-  final String username;
 
-  const ResultScreen({
+  const RecommendationScreen({
     super.key,
     required this.heartRate,
+    required this.recommendation,
     required this.ageRange,
     required this.gender,
     required this.conditions,
     required this.symptoms,
     required this.medications,
-    required this.username,
   });
 
-  @override
-  State<ResultScreen> createState() => _ResultScreenState();
-}
-
-class _ResultScreenState extends State<ResultScreen> {
-  late String _recommendation;
-  late DetailedComparison _comparison;
-
-  @override
-  void initState() {
-    super.initState();
-    _recommendation = RecommendationService.getDetailedRecommendation(
-      heartRate: widget.heartRate,
-      ageRange: widget.ageRange,
-      gender: widget.gender,
-      conditions: widget.conditions,
-      symptoms: widget.symptoms,
-      medications: widget.medications,
-    );
-    _comparison = ComparisonService.getDetailedComparison(
-      heartRate: widget.heartRate,
-      ageRange: widget.ageRange,
-      gender: widget.gender,
-      conditions: widget.conditions,
-      symptoms: widget.symptoms,
-    );
-  }
-
-  void _saveMeasurement() {
-    final record = MeasurementRecord(
-      id: DateTime.now().millisecondsSinceEpoch.toString(),
-      dateTime: DateTime.now(),
-      heartRate: widget.heartRate,
-      ageRange: widget.ageRange,
-      gender: widget.gender,
-      conditions: widget.conditions,
-      symptoms: widget.symptoms,
-      medications: widget.medications,
-      recommendation: _recommendation,
-      comparisonStatus: _comparison.status,
-      comparisonText: '${_comparison.status} - ${_comparison.percentile}',
-    );
-    MemoryHistoryService.saveMeasurement(record);
-  }
-
-  void _goToRecommendation() {
-    Navigator.push(
-      context,
-      MaterialPageRoute(
-        builder: (context) => RecommendationScreen(
-          heartRate: widget.heartRate,
-          recommendation: _recommendation,
-          ageRange: widget.ageRange,
-          gender: widget.gender,
-          conditions: widget.conditions,
-          symptoms: widget.symptoms,
-          medications: widget.medications,
-        ),
-      ),
-    );
-  }
-
-  void _goToComparison() {
-    Navigator.push(
-      context,
-      MaterialPageRoute(
-        builder: (context) => ComparisonScreen(
-          comparison: _comparison,
-          heartRate: widget.heartRate,
-          ageRange: widget.ageRange,
-          gender: widget.gender,
-        ),
-      ),
-    );
-  }
-
-  void _saveAndGoHome() {
-    _saveMeasurement();
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(
-        content: Text('✅ Medición guardada en tu historial'),
-        backgroundColor: Colors.green,
-        duration: Duration(seconds: 2),
-      ),
-    );
-    Navigator.pushAndRemoveUntil(
-      context,
-      MaterialPageRoute(
-        builder: (context) => HomeScreen(
-          username: widget.username,
-          ageRange: widget.ageRange,
-          gender: widget.gender,
-          conditions: widget.conditions,
-          symptoms: widget.symptoms,
-          medications: widget.medications,
-        ),
-      ),
-      (route) => false,
-    );
-  }
-
-  void _goToHomeWithoutSaving() {
-    Navigator.pushAndRemoveUntil(
-      context,
-      MaterialPageRoute(
-        builder: (context) => HomeScreen(
-          username: widget.username,
-          ageRange: widget.ageRange,
-          gender: widget.gender,
-          conditions: widget.conditions,
-          symptoms: widget.symptoms,
-          medications: widget.medications,
-        ),
-      ),
-      (route) => false,
-    );
-  }
-
   String _getStatusText() {
-    if (widget.heartRate < 60) return 'Bradicardia (Ritmo lento)';
-    if (widget.heartRate > 100) return 'Taquicardia (Ritmo rápido)';
-    return 'Normal (Ritmo saludable)';
+    if (heartRate < 60) return 'Bradicardia - Ritmo lento';
+    if (heartRate > 100) return 'Taquicardia - Ritmo rápido';
+    return 'Normal - Ritmo saludable';
   }
 
   Color _getStatusColor() {
-    if (widget.heartRate < 60) return Colors.orange;
-    if (widget.heartRate > 100) return Colors.red;
+    if (heartRate < 60) return Colors.orange;
+    if (heartRate > 100) return Colors.red;
     return Colors.green;
   }
 
-  String _getRecommendationSummary() {
-    if (widget.heartRate < 60) {
-      return 'Tu corazón late más lento de lo habitual. Puede ser normal si eres deportista, pero si tienes mareos o fatiga, consulta a tu médico.';
-    } else if (widget.heartRate > 100) {
-      return 'Tu corazón late más rápido de lo habitual. Esto puede deberse a estrés, cafeína o deshidratación. Si persiste, busca atención médica.';
-    } else {
-      return '¡Excelente! Tu frecuencia cardíaca está dentro del rango saludable. Mantén tus buenos hábitos.';
+  IconData _getStatusIcon() {
+    if (heartRate < 60) return Icons.speed;
+    if (heartRate > 100) return Icons.flash_on;
+    return Icons.health_and_safety;
+  }
+
+  String _cleanText(String text) {
+    return text.replaceAll('**', '').replaceAll('*', '');
+  }
+
+  List<Map<String, String>> _parseRecommendation() {
+    String clean = _cleanText(recommendation);
+    List<Map<String, String>> sections = [];
+    
+    List<String> parts = clean.split('\n\n');
+    
+    for (String part in parts) {
+      if (part.trim().isEmpty) continue;
+      
+      String title = '';
+      String content = part;
+      
+      if (part.contains(':')) {
+        List<String> lines = part.split('\n');
+        if (lines.isNotEmpty && lines[0].endsWith(':')) {
+          title = lines[0].replaceAll(':', '');
+          content = lines.skip(1).join('\n');
+        }
+      }
+      
+      sections.add({
+        'title': title,
+        'content': content.trim(),
+      });
     }
+    
+    return sections;
   }
 
   @override
   Widget build(BuildContext context) {
     final screenWidth = MediaQuery.of(context).size.width;
     final isSmallScreen = screenWidth < 600;
+    final sections = _parseRecommendation();
 
     return Scaffold(
       backgroundColor: Colors.white,
       appBar: AppBar(
-        title: const Text('Resultado', style: TextStyle(color: Colors.white)),
+        title: const Text('Recomendación', style: TextStyle(color: Colors.white)),
         backgroundColor: Colors.red,
         elevation: 0,
         centerTitle: true,
-        automaticallyImplyLeading: false,
       ),
       body: SafeArea(
         child: SingleChildScrollView(
-          padding: EdgeInsets.all(isSmallScreen ? 20 : 30),
+          padding: EdgeInsets.all(isSmallScreen ? 16 : 20),
           child: Column(
             children: [
-              const SizedBox(height: 20),
-              
+              // Tarjeta principal con FC y estado
               Container(
-                padding: const EdgeInsets.all(24),
+                width: double.infinity,
                 decoration: BoxDecoration(
-                  color: _getStatusColor().withValues(alpha: 0.1),
-                  shape: BoxShape.circle,
-                ),
-                child: Icon(
-                  Icons.favorite,
-                  size: isSmallScreen ? 70 : 90,
-                  color: _getStatusColor(),
-                ),
-              ),
-              const SizedBox(height: 24),
-              
-              Text(
-                '${widget.heartRate}',
-                style: TextStyle(
-                  fontSize: isSmallScreen ? 56 : 72,
-                  fontWeight: FontWeight.bold,
-                  color: Colors.red,
-                ),
-              ),
-              const Text(
-                'latidos por minuto',
-                style: TextStyle(fontSize: 16, color: Colors.black54),
-              ),
-              const SizedBox(height: 16),
-              
-              Container(
-                padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 10),
-                decoration: BoxDecoration(
-                  color: _getStatusColor().withValues(alpha: 0.1),
-                  borderRadius: BorderRadius.circular(30),
-                ),
-                child: Text(
-                  _getStatusText(),
-                  style: TextStyle(
-                    fontSize: 16,
-                    fontWeight: FontWeight.bold,
-                    color: _getStatusColor(),
+                  gradient: LinearGradient(
+                    colors: [Colors.red.shade400, Colors.red.shade700],
+                    begin: Alignment.topLeft,
+                    end: Alignment.bottomRight,
                   ),
+                  borderRadius: BorderRadius.circular(24),
                 ),
-              ),
-              const SizedBox(height: 16),
-              
-              Container(
-                padding: const EdgeInsets.all(16),
-                margin: const EdgeInsets.symmetric(vertical: 16),
-                decoration: BoxDecoration(
-                  color: Colors.grey.shade50,
-                  borderRadius: BorderRadius.circular(16),
-                  border: Border.all(color: Colors.grey.shade200),
-                ),
-                child: Row(
+                child: Column(
                   children: [
-                    Icon(Icons.info_outline, color: _getStatusColor(), size: 24),
-                    const SizedBox(width: 12),
-                    Expanded(
+                    Container(
+                      margin: const EdgeInsets.all(16),
+                      padding: const EdgeInsets.all(16),
+                      decoration: BoxDecoration(
+                        color: Colors.white.withValues(alpha: 0.2),
+                        shape: BoxShape.circle,
+                      ),
+                      child: Icon(_getStatusIcon(), size: 48, color: Colors.white),
+                    ),
+                    Text(
+                      '$heartRate',
+                      style: const TextStyle(fontSize: 56, fontWeight: FontWeight.bold, color: Colors.white),
+                    ),
+                    const Text(
+                      'latidos por minuto',
+                      style: TextStyle(fontSize: 14, color: Colors.white70),
+                    ),
+                    const SizedBox(height: 16),
+                    Container(
+                      padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 8),
+                      margin: const EdgeInsets.only(bottom: 20),
+                      decoration: BoxDecoration(
+                        color: _getStatusColor().withValues(alpha: 0.3),
+                        borderRadius: BorderRadius.circular(20),
+                      ),
                       child: Text(
-                        _getRecommendationSummary(),
-                        style: const TextStyle(fontSize: 14, height: 1.4),
+                        _getStatusText(),
+                        style: const TextStyle(fontSize: 14, fontWeight: FontWeight.bold, color: Colors.white),
                       ),
                     ),
                   ],
                 ),
               ),
-              
-              const SizedBox(height: 24),
-              
-              // Botón: Ver recomendación completa (NO guarda)
-              SizedBox(
-                width: double.infinity,
-                child: ElevatedButton(
-                  onPressed: _goToRecommendation,
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: Colors.red,
-                    foregroundColor: Colors.white,
-                    padding: const EdgeInsets.symmetric(vertical: 16),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(30),
+              const SizedBox(height: 20),
+
+              // Secciones separadas en tarjetas
+              ...sections.map((section) {
+                return Container(
+                  margin: const EdgeInsets.only(bottom: 16),
+                  padding: const EdgeInsets.all(16),
+                  decoration: BoxDecoration(
+                    color: _getCardColor(section['title'] ?? ''),
+                    borderRadius: BorderRadius.circular(16),
+                    border: Border.all(
+                      color: _getCardBorderColor(section['title'] ?? ''),
+                      width: 1,
                     ),
                   ),
-                  child: const Text(
-                    'Ver recomendación completa',
-                    style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      if (section['title']!.isNotEmpty)
+                        Row(
+                          children: [
+                            Icon(
+                              _getIconForTitle(section['title']!),
+                              color: _getIconColor(section['title']!),
+                              size: 22,
+                            ),
+                            const SizedBox(width: 10),
+                            Expanded(
+                              child: Text(
+                                section['title']!,
+                                style: TextStyle(
+                                  fontSize: 16,
+                                  fontWeight: FontWeight.bold,
+                                  color: _getTitleColor(section['title']!),
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
+                      if (section['title']!.isNotEmpty) const SizedBox(height: 12),
+                      Text(
+                        section['content']!,
+                        style: const TextStyle(fontSize: 14, height: 1.5, color: Colors.black87),
+                      ),
+                    ],
                   ),
-                ),
-              ),
-              const SizedBox(height: 12),
+                );
+              }),
+
+              const SizedBox(height: 16),
               
-              // Botón: Comparar con tu grupo de edad (NO guarda)
+              // Botón volver
               SizedBox(
                 width: double.infinity,
                 child: OutlinedButton.icon(
-                  onPressed: _goToComparison,
-                  icon: const Icon(Icons.people_outline),
-                  label: const Text(
-                    'Comparar con tu grupo de edad',
-                    style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
-                  ),
+                  onPressed: () => Navigator.pop(context),
+                  icon: const Icon(Icons.arrow_back),
+                  label: const Text('Volver', style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
                   style: OutlinedButton.styleFrom(
                     foregroundColor: Colors.red,
-                    side: BorderSide(color: Colors.red.shade300, width: 1.5),
-                    padding: const EdgeInsets.symmetric(vertical: 16),
+                    side: BorderSide(color: Colors.red.shade300),
+                    padding: const EdgeInsets.symmetric(vertical: 14),
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(30),
                     ),
                   ),
-                ),
-              ),
-              const SizedBox(height: 16),
-              
-              // Botón: Guardar y salir (ÚNICO QUE GUARDA)
-              SizedBox(
-                width: double.infinity,
-                child: ElevatedButton.icon(
-                  onPressed: _saveAndGoHome,
-                  icon: const Icon(Icons.save),
-                  label: const Text(
-                    'Guardar y salir',
-                    style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
-                  ),
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: Colors.green,
-                    foregroundColor: Colors.white,
-                    padding: const EdgeInsets.symmetric(vertical: 16),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(30),
-                    ),
-                  ),
-                ),
-              ),
-              const SizedBox(height: 8),
-              
-              // Botón: Salir sin guardar
-              TextButton.icon(
-                onPressed: _goToHomeWithoutSaving,
-                icon: const Icon(Icons.exit_to_app, size: 18),
-                label: const Text(
-                  'Salir sin guardar',
-                  style: TextStyle(fontSize: 14),
-                ),
-                style: TextButton.styleFrom(
-                  foregroundColor: Colors.red.shade400,
                 ),
               ),
             ],
@@ -342,5 +212,55 @@ class _ResultScreenState extends State<ResultScreen> {
         ),
       ),
     );
+  }
+
+  Color _getCardColor(String title) {
+    if (title.contains('ANÁLISIS') || title.contains('TU RITMO')) return Colors.red.shade50;
+    if (title.contains('FACTORES') || title.contains('RIESGO')) return Colors.orange.shade50;
+    if (title.contains('MEDICAMENTOS')) return Colors.blue.shade50;
+    if (title.contains('RECOMENDACIONES')) return Colors.green.shade50;
+    if (title.contains('MÉDICO')) return Colors.purple.shade50;
+    if (title.contains('CONSEJOS')) return Colors.teal.shade50;
+    return Colors.grey.shade50;
+  }
+
+  Color _getCardBorderColor(String title) {
+    if (title.contains('ANÁLISIS') || title.contains('TU RITMO')) return Colors.red.shade200;
+    if (title.contains('FACTORES') || title.contains('RIESGO')) return Colors.orange.shade200;
+    if (title.contains('MEDICAMENTOS')) return Colors.blue.shade200;
+    if (title.contains('RECOMENDACIONES')) return Colors.green.shade200;
+    if (title.contains('MÉDICO')) return Colors.purple.shade200;
+    if (title.contains('CONSEJOS')) return Colors.teal.shade200;
+    return Colors.grey.shade200;
+  }
+
+  Color _getTitleColor(String title) {
+    if (title.contains('ANÁLISIS') || title.contains('TU RITMO')) return Colors.red.shade700;
+    if (title.contains('FACTORES') || title.contains('RIESGO')) return Colors.orange.shade700;
+    if (title.contains('MEDICAMENTOS')) return Colors.blue.shade700;
+    if (title.contains('RECOMENDACIONES')) return Colors.green.shade700;
+    if (title.contains('MÉDICO')) return Colors.purple.shade700;
+    if (title.contains('CONSEJOS')) return Colors.teal.shade700;
+    return Colors.grey.shade700;
+  }
+
+  IconData _getIconForTitle(String title) {
+    if (title.contains('ANÁLISIS') || title.contains('TU RITMO')) return Icons.favorite;
+    if (title.contains('FACTORES') || title.contains('RIESGO')) return Icons.warning_amber;
+    if (title.contains('MEDICAMENTOS')) return Icons.medical_services;
+    if (title.contains('RECOMENDACIONES')) return Icons.lightbulb;
+    if (title.contains('MÉDICO')) return Icons.local_hospital;
+    if (title.contains('CONSEJOS')) return Icons.fitness_center;
+    return Icons.info;
+  }
+
+  Color _getIconColor(String title) {
+    if (title.contains('ANÁLISIS') || title.contains('TU RITMO')) return Colors.red;
+    if (title.contains('FACTORES') || title.contains('RIESGO')) return Colors.orange;
+    if (title.contains('MEDICAMENTOS')) return Colors.blue;
+    if (title.contains('RECOMENDACIONES')) return Colors.green;
+    if (title.contains('MÉDICO')) return Colors.purple;
+    if (title.contains('CONSEJOS')) return Colors.teal;
+    return Colors.grey;
   }
 }
