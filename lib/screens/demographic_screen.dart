@@ -1,3 +1,7 @@
+<<<<<<< HEAD
+=======
+
+>>>>>>> f1c9e159325cd732cdb8e01490cb2d4268e7ca40
 // lib/screens/demographic_screen.dart
 import 'package:flutter/material.dart';
 import '../utils/constants.dart';
@@ -404,4 +408,3 @@ class _DemographicScreenState extends State<DemographicScreen> {
     );
   }
 }
-

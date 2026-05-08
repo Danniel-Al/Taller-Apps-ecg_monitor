@@ -1,6 +1,5 @@
-
 // lib/screens/comparison_screen.dart
-// BOTÓN "VOLVER" EN LUGAR DE "NUEVA MEDICIÓN"
+// VERSIÓN REDISEÑADA - COMO LA IMAGEN
 
 import 'package:flutter/material.dart';
 import '../services/comparison_service.dart';
@@ -20,171 +19,198 @@ class ComparisonScreen extends StatelessWidget {
   });
 
   Color _getStatusColor() {
-    switch (comparison.statusColor) {
-      case 'verde': return Colors.green;
-      case 'naranja': return Colors.orange;
-      case 'rojo': return Colors.red;
-      default: return Colors.grey;
-    }
+    if (comparison.heartRate < 60) return Colors.orange;
+    if (comparison.heartRate > comparison.maxNormal) return Colors.red;
+    return Colors.green;
   }
 
   @override
   Widget build(BuildContext context) {
-    final screenWidth = MediaQuery.of(context).size.width;
-    final isSmallScreen = screenWidth < 600;
-
     return Scaffold(
       backgroundColor: Colors.white,
       appBar: AppBar(
-        title: const Text('Comparación por edad', style: TextStyle(color: Colors.white)),
+        title: const Text(
+          'Comparación por edad',
+          style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
+        ),
         backgroundColor: Colors.red,
         elevation: 0,
         centerTitle: true,
+        leading: IconButton(
+          icon: const Icon(Icons.arrow_back, color: Colors.white),
+          onPressed: () => Navigator.pop(context),
+        ),
       ),
-      body: SafeArea(
-        child: SingleChildScrollView(
-          padding: EdgeInsets.all(isSmallScreen ? 20 : 30),
-          child: Column(
-            children: [
-              Container(
-                width: double.infinity,
-                padding: const EdgeInsets.all(24),
-                decoration: BoxDecoration(
-                  gradient: LinearGradient(
-                    colors: [Colors.red.shade50, Colors.red.shade100],
-                    begin: Alignment.topLeft,
-                    end: Alignment.bottomRight,
+      body: SingleChildScrollView(
+        padding: const EdgeInsets.all(16),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            // Tarjeta 1: Información de tu medición
+            Container(
+              width: double.infinity,
+              padding: const EdgeInsets.all(20),
+              decoration: BoxDecoration(
+                color: Colors.white,
+                borderRadius: BorderRadius.circular(16),
+                border: Border.all(color: Colors.grey.shade200),
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.grey.shade100,
+                    blurRadius: 8,
+                    offset: const Offset(0, 2),
                   ),
-                  borderRadius: BorderRadius.circular(20),
-                ),
-                child: Column(
-                  children: [
-                    const Icon(Icons.people, size: 48, color: Colors.red),
-                    const SizedBox(height: 12),
-                    Text(
-                      'Tu ritmo: ${comparison.heartRate} lpm',
-                      style: const TextStyle(
-                        fontSize: 24,
-                        fontWeight: FontWeight.bold,
-                        color: Colors.red,
-                      ),
-                    ),
-                    const SizedBox(height: 8),
-                    Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 6),
-                      decoration: BoxDecoration(
-                        color: _getStatusColor().withOpacity(0.2),
-                        borderRadius: BorderRadius.circular(20),
-                      ),
-                      child: Text(
-                        comparison.status,
+                ],
+              ),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  const Row(
+                    children: [
+                      Icon(Icons.favorite, color: Colors.red, size: 20),
+                      SizedBox(width: 8),
+                      Text(
+                        'Tu medición',
                         style: TextStyle(
-                          fontSize: 14,
+                          fontSize: 16,
                           fontWeight: FontWeight.bold,
-                          color: _getStatusColor(),
+                          color: Colors.red,
                         ),
                       ),
-                    ),
-                  ],
-                ),
-              ),
-              const SizedBox(height: 24),
-              Container(
-                padding: const EdgeInsets.all(20),
-                decoration: BoxDecoration(
-                  color: Colors.grey.shade50,
-                  borderRadius: BorderRadius.circular(16),
-                  border: Border.all(color: Colors.grey.shade200),
-                ),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    const Text(
-                      '📊 Comparación con tu grupo etario',
-                      style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
-                    ),
-                    const Divider(height: 24),
-                    _buildInfoRow('Tu sexo', comparison.gender),
-                    _buildInfoRow('Rango etario', '${comparison.ageGroup} años (${comparison.description})'),
-                    _buildInfoRow('Rango normal esperado', '${comparison.minNormal} - ${comparison.maxNormal} lpm'),
-                    _buildInfoRow('Rango ideal', '${comparison.idealMin} - ${comparison.idealMax} lpm'),
-                    _buildInfoRow('Tu posición', comparison.percentile),
-                  ],
-                ),
-              ),
-              const SizedBox(height: 24),
-              Container(
-                padding: const EdgeInsets.all(20),
-                decoration: BoxDecoration(
-                  color: _getStatusColor().withOpacity(0.05),
-                  borderRadius: BorderRadius.circular(16),
-                  border: Border.all(color: _getStatusColor().withOpacity(0.2)),
-                ),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Row(
-                      children: [
-                        Icon(Icons.medical_services, color: _getStatusColor()),
-                        const SizedBox(width: 8),
-                        const Text(
-                          'Interpretación y recomendaciones',
-                          style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                    ],
+                  ),
+                  const SizedBox(height: 12),
+                  Row(
+                    children: [
+                      Text(
+                        '${comparison.heartRate}',
+                        style: const TextStyle(
+                          fontSize: 32,
+                          fontWeight: FontWeight.bold,
+                          color: Colors.red,
                         ),
-                      ],
+                      ),
+                      const SizedBox(width: 8),
+                      Text(
+                        'lpm',
+                        style: TextStyle(
+                          fontSize: 16,
+                          color: Colors.grey.shade600,
+                        ),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 8),
+                  Container(
+                    padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
+                    decoration: BoxDecoration(
+                      color: _getStatusColor().withValues(alpha: 0.1),
+                      borderRadius: BorderRadius.circular(12),
                     ),
-                    const Divider(height: 24),
-                    Text(
-                      comparison.recommendation,
-                      style: const TextStyle(fontSize: 14, height: 1.5),
-                    ),
-                  ],
-                ),
-              ),
-              const SizedBox(height: 24),
-              Container(
-                padding: const EdgeInsets.all(12),
-                decoration: BoxDecoration(
-                  color: Colors.blue.shade50,
-                  borderRadius: BorderRadius.circular(12),
-                ),
-                child: const Row(
-                  children: [
-                    Icon(Icons.info_outline, color: Colors.blue, size: 20),
-                    SizedBox(width: 8),
-                    Expanded(
-                      child: Text(
-                        'Los rangos son referenciales. Factores como actividad física, medicamentos y emociones pueden influir en tu medición.',
-                        style: TextStyle(fontSize: 11, color: Colors.black54),
+                    child: Text(
+                      comparison.status,
+                      style: TextStyle(
+                        fontSize: 12,
+                        fontWeight: FontWeight.w500,
+                        color: _getStatusColor(),
                       ),
                     ),
-                  ],
-                ),
-              ),
-              const SizedBox(height: 24),
-              
-              // Botón VOLVER (no guarda, solo regresa)
-              SizedBox(
-                width: double.infinity,
-                child: OutlinedButton.icon(
-                  onPressed: () => Navigator.pop(context),
-                  icon: const Icon(Icons.arrow_back),
-                  label: const Text(
-                    'Volver',
-                    style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
                   ),
-                  style: OutlinedButton.styleFrom(
-                    foregroundColor: Colors.red,
-                    side: BorderSide(color: Colors.red.shade300),
-                    padding: const EdgeInsets.symmetric(vertical: 14),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(30),
+                ],
+              ),
+            ),
+            const SizedBox(height: 16),
+
+            // Tarjeta 2: Comparación con tu grupo etario
+            Container(
+              width: double.infinity,
+              padding: const EdgeInsets.all(20),
+              decoration: BoxDecoration(
+                color: Colors.white,
+                borderRadius: BorderRadius.circular(16),
+                border: Border.all(color: Colors.grey.shade200),
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.grey.shade100,
+                    blurRadius: 8,
+                    offset: const Offset(0, 2),
+                  ),
+                ],
+              ),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  const Row(
+                    children: [
+                      Icon(Icons.people, color: Colors.blue, size: 20),
+                      SizedBox(width: 8),
+                      Text(
+                        'Comparación con tu grupo etario',
+                        style: TextStyle(
+                          fontSize: 16,
+                          fontWeight: FontWeight.bold,
+                          color: Colors.blue,
+                        ),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 16),
+                  _buildInfoRow('Tu sexo', comparison.gender),
+                  _buildInfoRow('Rango etario', '${comparison.ageGroup} años'),
+                  _buildInfoRow('Rango normal esperado', '${comparison.minNormal} - ${comparison.maxNormal} lpm'),
+                  _buildInfoRow('Rango ideal', '${comparison.idealMin} - ${comparison.idealMax} lpm'),
+                  _buildInfoRow('Tu posición', comparison.percentile),
+                ],
+              ),
+            ),
+            const SizedBox(height: 16),
+
+            // Tarjeta 3: Interpretación y recomendaciones
+            Container(
+              width: double.infinity,
+              padding: const EdgeInsets.all(20),
+              decoration: BoxDecoration(
+                color: Colors.white,
+                borderRadius: BorderRadius.circular(16),
+                border: Border.all(color: Colors.grey.shade200),
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.grey.shade100,
+                    blurRadius: 8,
+                    offset: const Offset(0, 2),
+                  ),
+                ],
+              ),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  const Row(
+                    children: [
+                      Icon(Icons.medical_services, color: Colors.green, size: 20),
+                      SizedBox(width: 8),
+                      Text(
+                        'Interpretación y recomendaciones',
+                        style: TextStyle(
+                          fontSize: 16,
+                          fontWeight: FontWeight.bold,
+                          color: Colors.green,
+                        ),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 12),
+                  Text(
+                    _getInterpretation(),
+                    style: const TextStyle(
+                      fontSize: 14,
+                      height: 1.5,
+                      color: Colors.black87,
                     ),
                   ),
-                ),
+                ],
               ),
-            ],
-          ),
+            ),
+          ],
         ),
       ),
     );
@@ -192,22 +218,73 @@ class ComparisonScreen extends StatelessWidget {
 
   Widget _buildInfoRow(String label, String value) {
     return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 6),
+      padding: const EdgeInsets.only(bottom: 10),
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           SizedBox(
-            width: 120,
-            child: Text(label, style: const TextStyle(color: Colors.black54, fontSize: 13)),
+            width: 130,
+            child: Text(
+              label,
+              style: TextStyle(
+                fontSize: 13,
+                color: Colors.grey.shade600,
+              ),
+            ),
           ),
           Expanded(
             child: Text(
               value,
-              style: const TextStyle(fontWeight: FontWeight.w500, fontSize: 13),
+              style: const TextStyle(
+                fontSize: 13,
+                fontWeight: FontWeight.w500,
+                color: Colors.black87,
+              ),
             ),
           ),
         ],
       ),
     );
+  }
+
+  String _getInterpretation() {
+    String interpretation = '';
+    
+    if (comparison.heartRate >= comparison.minNormal && comparison.heartRate <= comparison.maxNormal) {
+      interpretation += "✅ ¡Tu ritmo cardíaco es normal!\n\n";
+      interpretation += "Para ${comparison.description} de tu grupo etario (${comparison.ageGroup} años), "
+          "lo esperado es un rango de ${comparison.minNormal}-${comparison.maxNormal} lpm. "
+          "Tu medición de ${comparison.heartRate} lpm está dentro de los parámetros saludables.\n\n";
+      
+      if (comparison.heartRate < comparison.idealMin) {
+        interpretation += "💚 **Nota**: Tu ritmo está en la parte baja del rango normal. "
+            "Esto puede ser señal de buena condición cardiovascular, especialmente si eres activo físicamente.\n\n";
+      } else if (comparison.heartRate > comparison.idealMax) {
+        interpretation += "💛 **Nota**: Aunque estás dentro del rango normal, tu ritmo está en la parte alta. "
+            "Si no hiciste ejercicio antes de medirte, podrías beneficiarte de técnicas de relajación.\n\n";
+      }
+    } else if (comparison.heartRate < comparison.minNormal) {
+      interpretation += "🧡 Tu ritmo cardíaco está por debajo de lo esperado (Bradicardia)\n\n";
+      interpretation += "Para tu grupo etario (${comparison.ageGroup} años), el rango normal es de "
+          "${comparison.minNormal}-${comparison.maxNormal} lpm. Tu medición de ${comparison.heartRate} lpm está por debajo.\n\n";
+      interpretation += "**Esto puede significar:**\n";
+      interpretation += "• Si eres deportista, puede ser una señal de excelente condición física.\n";
+      interpretation += "• Si no haces ejercicio, podría indicar que tu corazón bombea con menos fuerza.\n\n";
+    } else {
+      interpretation += "❤️‍🔥 Tu ritmo cardíaco está por encima de lo esperado (Taquicardia)\n\n";
+      interpretation += "Para tu grupo etario (${comparison.ageGroup} años), el rango normal es de "
+          "${comparison.minNormal}-${comparison.maxNormal} lpm. Tu medición de ${comparison.heartRate} lpm supera este límite.\n\n";
+      interpretation += "**Causas frecuentes temporales:**\n";
+      interpretation += "• Estrés o ansiedad\n";
+      interpretation += "• Cafeína o bebidas energéticas\n";
+      interpretation += "• Deshidratación\n";
+      interpretation += "• Fiebre o infección\n";
+      interpretation += "• Ejercicio reciente\n\n";
+    }
+    
+    interpretation += "\n---\n💙 **Recuerda**: Esta app es una herramienta de monitoreo. "
+        "Si tienes dudas, consulta a un profesional de la salud.";
+    
+    return interpretation;
   }
 }

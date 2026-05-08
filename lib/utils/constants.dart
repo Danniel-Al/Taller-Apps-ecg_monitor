@@ -1,6 +1,4 @@
 // lib/utils/constants.dart
-// OPCIONES PARA LOS SELECTORES DEMOGRÁFICOS
-
 const List<String> ageRanges = [
   '18-30 años',
   '31-45 años',
@@ -9,19 +7,21 @@ const List<String> ageRanges = [
   '>75 años',
 ];
 
+// Eliminar "Prefiero no decirlo" para mejor análisis clínico
 const List<String> genders = [
   'Femenino',
   'Masculino',
-  'Prefiero no decirlo',
 ];
 
 const List<String> conditionsList = [
-  'Ninguno',
   'Hipertensión arterial',
+  'Diabetes mellitus',
+  'Colesterol alto (dislipidemia)',
   'Insuficiencia cardíaca',
   'Infarto previo',
   'Arritmias diagnosticadas',
   'Cardiopatía congénita',
+  'Tabaquismo (fumador activo o exfumador)',
 ];
 
 const List<String> symptomsList = [
@@ -30,12 +30,13 @@ const List<String> symptomsList = [
   'Dolor en el pecho',
   'Mareos o desmayos',
   'Falta de aire',
+  'Fatiga o cansancio extremo',
 ];
 
 const List<String> medicationsList = [
   'Ninguno',
   '💊 Betabloqueadores (para presión o ritmo cardíaco)',
-  '🧠 Antidepresivos / ansiolíticos (para depresión o ansiedad)',
+  '🧠 Antidepresivos / ansiolíticos',
   '⚡ Antiarrítmicos (para problemas del ritmo cardíaco)',
   '💧 Diuréticos (pastillas para eliminar líquidos)',
 ];

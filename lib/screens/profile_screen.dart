@@ -1,8 +1,7 @@
 // lib/screens/profile_screen.dart
-// PANTALLA DE PERFIL CON BOTÓN DE CERRAR SESIÓN
-
 import 'package:flutter/material.dart';
 import '../models/user_data.dart';
+import '../services/memory_history_service.dart';
 import 'update_demographic_screen.dart';
 import 'login_screen.dart';
 
@@ -15,7 +14,7 @@ class ProfileScreen extends StatefulWidget {
 }
 
 class _ProfileScreenState extends State<ProfileScreen> {
-  UserData _userData = UserData(username: '');
+  UserData _userData = UserData(username: '', conditions: []);
 
   @override
   void initState() {
@@ -30,7 +29,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
         hasCompletedDemographics: true,
         ageRange: 2,
         gender: 0,
-        conditions: 1,
+        conditions: const [0, 7],
         symptoms: 0,
         medications: 0,
       );
@@ -42,15 +41,13 @@ class _ProfileScreenState extends State<ProfileScreen> {
       context: context,
       builder: (context) => AlertDialog(
         title: const Text('Cerrar sesión'),
-        content: const Text('¿Estás seguro de que deseas cerrar sesión? Los datos guardados se mantendrán.'),
+        content: const Text('¿Estás seguro de que deseas cerrar sesión?'),
         actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context),
-            child: const Text('Cancelar'),
-          ),
+          TextButton(onPressed: () => Navigator.pop(context), child: const Text('Cancelar')),
           TextButton(
             onPressed: () {
-              Navigator.pop(context); // Cerrar diálogo
+              Navigator.pop(context);
+              MemoryHistoryService.clearCurrentUser();
               Navigator.pushAndRemoveUntil(
                 context,
                 MaterialPageRoute(builder: (_) => const LoginScreen()),
@@ -71,17 +68,13 @@ class _ProfileScreenState extends State<ProfileScreen> {
     );
     if (updated == true) {
       _loadUserData();
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Datos actualizados'), backgroundColor: Colors.green),
-      );
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Datos actualizados'), backgroundColor: Colors.green),
+        );
+      }
     }
   }
-
-  String _getAgeRangeText() => const ['18-30 años', '31-45 años', '46-60 años', '61-75 años', '>75 años'][_userData.ageRange];
-  String _getGenderText() => const ['Femenino', 'Masculino', 'Prefiero no decirlo'][_userData.gender];
-  String _getConditionsText() => const ['Ninguno', 'Hipertensión', 'Insuficiencia cardíaca', 'Infarto previo', 'Arritmias', 'Cardiopatía congénita'][_userData.conditions];
-  String _getSymptomsText() => const ['Ningún síntoma', 'Palpitaciones', 'Dolor en el pecho', 'Mareos', 'Falta de aire'][_userData.symptoms];
-  String _getMedicationsText() => const ['Ninguno', 'Betabloqueadores', 'Antidepresivos', 'Antiarrítmicos', 'Diuréticos'][_userData.medications];
 
   @override
   Widget build(BuildContext context) {
@@ -97,51 +90,31 @@ class _ProfileScreenState extends State<ProfileScreen> {
         padding: const EdgeInsets.all(20),
         child: Column(
           children: [
-            // Tarjeta de bienvenida
             Container(
               padding: const EdgeInsets.all(20),
-              decoration: BoxDecoration(
-                gradient: LinearGradient(
-                  colors: [Colors.red.shade50, Colors.red.shade100],
-                  begin: Alignment.topLeft,
-                  end: Alignment.bottomRight,
-                ),
-                borderRadius: BorderRadius.circular(20),
-              ),
+              decoration: BoxDecoration(gradient: LinearGradient(colors: [Colors.red.shade50, Colors.red.shade100]), borderRadius: BorderRadius.circular(20)),
+
+
+
               child: Row(
                 children: [
-                  Container(
-                    padding: const EdgeInsets.all(12),
-                    decoration: const BoxDecoration(
-                      color: Colors.white,
-                      shape: BoxShape.circle,
-                    ),
-                    child: const Icon(Icons.person, color: Colors.red, size: 32),
-                  ),
+                  Container(padding: const EdgeInsets.all(12), decoration: const BoxDecoration(color: Colors.white, shape: BoxShape.circle), child: const Icon(Icons.person, color: Colors.red, size: 32)),
+
+
+
+
                   const SizedBox(width: 16),
                   Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Text(
-                        'Hola, ${_userData.username}',
-                        style: const TextStyle(
-                          fontSize: 20,
-                          fontWeight: FontWeight.bold,
-                          color: Colors.red,
-                        ),
-                      ),
-                      const Text(
-                        'Aquí puedes ver y editar tus datos',
-                        style: TextStyle(fontSize: 12, color: Colors.black54),
-                      ),
+                      Text('Hola, ${_userData.username}', style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold, color: Colors.red)),
+                      const Text('Aquí puedes ver y editar tus datos', style: TextStyle(fontSize: 12, color: Colors.black54)),
                     ],
                   ),
                 ],
               ),
             ),
             const SizedBox(height: 24),
-
-            // Botón editar datos
             SizedBox(
               width: double.infinity,
               child: ElevatedButton.icon(
@@ -151,17 +124,14 @@ class _ProfileScreenState extends State<ProfileScreen> {
                 style: ElevatedButton.styleFrom(
                   backgroundColor: Colors.white,
                   foregroundColor: Colors.red,
-                  padding: const EdgeInsets.symmetric(vertical: 12),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(30),
-                    side: BorderSide(color: Colors.red.shade300),
-                  ),
+                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(30), side: BorderSide(color: Colors.red.shade300)),
+
+
+
                 ),
               ),
             ),
             const SizedBox(height: 16),
-
-            // Botón cerrar sesión (NUEVO)
             SizedBox(
               width: double.infinity,
               child: OutlinedButton.icon(
@@ -171,31 +141,17 @@ class _ProfileScreenState extends State<ProfileScreen> {
                 style: OutlinedButton.styleFrom(
                   foregroundColor: Colors.red,
                   side: BorderSide(color: Colors.red.shade300),
-                  padding: const EdgeInsets.symmetric(vertical: 12),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(30),
-                  ),
+                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(30)),
                 ),
               ),
             ),
             const SizedBox(height: 24),
-
-            // Título de datos guardados
-            const Text(
-              'Tus datos actuales',
-              style: TextStyle(
-                fontSize: 18,
-                fontWeight: FontWeight.bold,
-                color: Colors.red,
-              ),
-            ),
+            const Text('Tus datos actuales', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: Colors.red)),
             const SizedBox(height: 16),
-
-            // Tarjetas de información
             _buildInfoCard('👤 Nombre de usuario', _userData.username),
-            _buildInfoCard('🎂 Edad', _getAgeRangeText()),
+            _buildInfoCard('🎂 Edad', _getAgeText()),
             _buildInfoCard('👤 Sexo', _getGenderText()),
-            _buildInfoCard('❤️ Antecedentes', _getConditionsText()),
+            _buildInfoCard('❤️ Antecedentes', _userData.getConditionsText()),
             _buildInfoCard('🤒 Síntomas', _getSymptomsText()),
             _buildInfoCard('💊 Medicamentos', _getMedicationsText()),
           ],
@@ -207,22 +163,20 @@ class _ProfileScreenState extends State<ProfileScreen> {
   Widget _buildInfoCard(String label, String value) {
     return Card(
       margin: const EdgeInsets.only(bottom: 12),
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
       child: Padding(
         padding: const EdgeInsets.all(16),
         child: Row(
           children: [
-            Expanded(
-              child: Text(label, style: const TextStyle(color: Colors.black54)),
-            ),
-            Text(
-              value,
-              style: const TextStyle(fontWeight: FontWeight.w500),
-            ),
+            Expanded(child: Text(label, style: const TextStyle(color: Colors.black54))),
+            Expanded(child: Text(value, style: const TextStyle(fontWeight: FontWeight.w500), textAlign: TextAlign.right)),
           ],
         ),
       ),
     );
   }
-}
 
+  String _getAgeText() => const ['18-30 años', '31-45 años', '46-60 años', '61-75 años', '>75 años'][_userData.ageRange];
+  String _getGenderText() => const ['Femenino', 'Masculino', 'Prefiero no decirlo'][_userData.gender];
+  String _getSymptomsText() => const ['Ningún síntoma', 'Palpitaciones', 'Dolor en el pecho', 'Mareos', 'Falta de aire', 'Fatiga extrema'][_userData.symptoms];
+  String _getMedicationsText() => const ['Ninguno', 'Betabloqueadores', 'Antidepresivos', 'Antiarrítmicos', 'Diuréticos'][_userData.medications];
+}
