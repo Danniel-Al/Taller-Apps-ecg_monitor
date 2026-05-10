@@ -9,7 +9,7 @@ Aplicación móvil desarrollada en flutter para el monitoreo y análisis de señ
 # Funcionamiento
 El ad8332 capta la actividad eléctrica del corazón por los electrodos. Acto seguido el esp32 capta el valor por el pin 34, aplica un filtro de media de 8 muestras y transmite los datos vía WiFi por TCP en el puerto 8080. Por otro lado, la app de flutter detecta los picos del complejo QRS y calcula la frecuencia cardíaca. 
 
-# equisitos:
+# Requisitos:
 - Flutter 3.x o superior
 - Dispositivo Android (puede ser emulado)
 - El dispositivo y el ESP32 deben estar en la misma red WiFi
