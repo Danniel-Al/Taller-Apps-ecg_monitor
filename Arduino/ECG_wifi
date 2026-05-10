@@ -1,0 +1,58 @@
+#include <WiFi.h>
+#include <math.h>
+
+const char* ssid     = ""; //Cambiar por su red WiFi
+const char* password = ""; //Cambiar por su contraseña WiFi
+
+WiFiServer server(8080);
+WiFiClient client;
+
+#define LO_plus  18
+#define LO_minus 19
+
+// Filtro de media móvil
+const int N = 8;
+int buffer_ecg[N] = {0};
+int idx = 0;
+
+int filtrar(int nueva) {
+  buffer_ecg[idx] = nueva;
+  idx = (idx + 1) % N;
+  long suma = 0;
+  for (int i = 0; i < N; i++) suma += buffer_ecg[i];
+  return suma / N;
+}
+
+void setup() {
+  Serial.begin(115200);
+  pinMode(LO_plus,  INPUT);
+  pinMode(LO_minus, INPUT);
+
+  WiFi.begin(ssid, password);
+  Serial.print("Conectando WiFi");
+  while (WiFi.status() != WL_CONNECTED) {
+    delay(500);
+    Serial.print(".");
+  }
+  Serial.println("\nIP: " + WiFi.localIP().toString());
+  server.begin();
+}
+
+void loop() {
+  if (!client || !client.connected()) {
+    client = server.available();
+    return;
+  }
+
+  if (digitalRead(LO_plus) || digitalRead(LO_minus)) {
+    client.println(-1);   // -1 = señal inválida (electrodo suelto)
+    delay(5);
+    return;
+  }
+
+  // Leer y filtrar señal real del AD8232
+  int valor = filtrar(analogRead(34));
+  client.println(valor);
+
+  delay(5); // ~200 Hz
+}

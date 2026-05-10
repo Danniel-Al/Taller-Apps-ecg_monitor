@@ -144,7 +144,7 @@ class _MeasuringScreenState extends State<MeasuringScreen>
     _socket?.destroy();
 
     // BPM = latidos en 30s → ×2
-    final int heartRate = (_heartBeats * 2).clamp(40, 180);
+    final int heartRate = (_heartBeats * 2).clamp(0, 180); //yurrrrr
 
     if (mounted) {
       Navigator.pushReplacement(
